@@ -1,0 +1,2659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Trip Planner">
+<meta name="theme-color" content="#1A1714">
+<title>Trip Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* =====================================================
+   CSS VARIABLES & RESET
+===================================================== */
+:root {
+  --bg: #F7F4EF;
+  --surface: #FFFFFF;
+  --surface2: #F0ECE4;
+  --border: #E2DDD5;
+  --text: #1A1714;
+  --text2: #6B655C;
+  --text3: #9E988E;
+  --accent: #2D5A3D;
+  --accent-light: #E8F0EB;
+  --red: #8B2E2E;
+  --red-light: #F5EAEA;
+  --gold: #8B6914;
+  --gold-light: #F5EDD8;
+  --blue: #1A4A6B;
+  --blue-light: #E0EAF3;
+  --purple: #4A2E6B;
+  --purple-light: #EDE8F5;
+  --rose: #6B2E4A;
+  --rose-light: #F5E8EF;
+  --teal: #1A6B5A;
+  --teal-light: #E0F3EE;
+  --plum: #5A2E6B;
+  --plum-light: #F0E8F5;
+  --radius: 12px;
+  --radius-sm: 8px;
+
+  /* Theme vars (overridden per trip) */
+  --theme-bg: #1A1714;
+  --theme-accent: #2D5A3D;
+  --theme-accent-light: #E8F0EB;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* =====================================================
+   SCREENS
+===================================================== */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: block; }
+
+/* =====================================================
+   LOGIN SCREEN
+===================================================== */
+#screen-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #1A1714;
+  padding: 2rem;
+}
+.login-box {
+  text-align: center;
+  max-width: 380px;
+  width: 100%;
+}
+.login-logo {
+  font-size: 3.5rem;
+  margin-bottom: 1.5rem;
+  display: block;
+}
+.login-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+.login-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 2.5rem;
+}
+.login-field {
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.07);
+  color: white;
+  outline: none;
+  text-align: center;
+  margin-bottom: 1rem;
+  transition: border-color 0.2s;
+  letter-spacing: 0.02em;
+}
+.login-field::placeholder { color: rgba(255,255,255,0.3); }
+.login-field:focus { border-color: rgba(255,255,255,0.4); }
+.login-btn {
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: none;
+  background: white;
+  color: #1A1714;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: opacity 0.2s;
+}
+.login-btn:hover { opacity: 0.88; }
+.login-hint {
+  font-size: 12px;
+  color: rgba(255,255,255,0.25);
+  margin-top: 1.5rem;
+}
+.saved-users {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+.saved-user-chip {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.saved-user-chip:hover { background: rgba(255,255,255,0.14); color: white; }
+
+/* =====================================================
+   HOME SCREEN
+===================================================== */
+#screen-home { background: var(--bg); }
+.home-header {
+  background: #1A1714;
+  padding: 2rem 2rem 1.75rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+.home-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(255,255,255,0.015) 30px, rgba(255,255,255,0.015) 31px);
+  pointer-events: none;
+}
+.home-header-left { position: relative; z-index: 1; }
+.home-header-label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+.home-header-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  color: white;
+  font-weight: 600;
+  line-height: 1.15;
+}
+.home-header-title span { color: rgba(255,255,255,0.45); font-style: italic; }
+.home-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+.home-logout-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.55);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.home-logout-btn:hover { background: rgba(255,255,255,0.12); color: white; }
+.home-new-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 20px;
+  border-radius: var(--radius);
+  border: none;
+  background: white;
+  color: #1A1714;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.home-new-btn:hover { opacity: 0.85; }
+.home-new-btn .plus { font-size: 18px; font-weight: 300; line-height: 1; }
+
+.home-body { padding: 2rem 2rem 4rem; max-width: 1200px; margin: 0 auto; }
+.home-section-label {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text3);
+  font-weight: 500;
+  margin-bottom: 1.25rem;
+}
+
+/* TRIP CARDS GRID */
+.trips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+.trip-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+}
+.trip-card:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+.trip-card-header {
+  padding: 1.5rem 1.5rem 1.25rem;
+  position: relative;
+}
+.trip-card-icon {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+.trip-card-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  color: white;
+}
+.trip-card-subtitle {
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+}
+.trip-card-body {
+  background: var(--surface);
+  padding: 1rem 1.5rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+}
+.trip-card-meta { font-size: 12px; color: var(--text2); }
+.trip-card-delete {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  opacity: 0;
+}
+.trip-card:hover .trip-card-delete { opacity: 1; }
+.trip-card-delete:hover { background: var(--red-light); border-color: var(--red); color: var(--red); opacity: 1; }
+
+/* Empty home state */
+.home-empty {
+  text-align: center;
+  padding: 5rem 1rem;
+  color: var(--text3);
+}
+.home-empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+.home-empty-title { font-size: 18px; color: var(--text2); font-weight: 500; margin-bottom: 0.5rem; }
+.home-empty-sub { font-size: 13px; }
+
+/* =====================================================
+   NEW TRIP MODAL
+===================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+.modal-field-label {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.modal-field {
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+  margin-bottom: 1.25rem;
+}
+.modal-field:focus { border-color: var(--accent); }
+
+/* Icon picker */
+.icon-picker {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+  margin-bottom: 1.25rem;
+}
+.icon-opt {
+  font-size: 1.4rem;
+  padding: 8px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  background: var(--surface2);
+}
+.icon-opt:hover { border-color: var(--border); transform: scale(1.1); }
+.icon-opt.selected { border-color: var(--accent); background: var(--accent-light); }
+
+/* Theme picker */
+.theme-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.theme-opt {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.theme-opt:hover { transform: scale(1.1); }
+.theme-opt.selected { outline-color: var(--text); }
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+.btn-cancel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-cancel:hover { background: var(--surface2); }
+.btn-primary {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 22px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-primary:hover { opacity: 0.85; }
+
+/* =====================================================
+   TRIP SCREEN
+===================================================== */
+#screen-trip { background: var(--bg); }
+
+/* TRIP HERO */
+.trip-hero {
+  color: white;
+  padding: 1.75rem 2rem 1.75rem;
+  position: relative;
+  overflow: hidden;
+}
+.trip-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(255,255,255,0.02) 30px, rgba(255,255,255,0.02) 31px);
+  pointer-events: none;
+}
+.trip-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  gap: 12px;
+}
+.trip-hero-back {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  position: relative; z-index: 1;
+  flex-shrink: 0;
+}
+.trip-hero-back:hover { background: rgba(255,255,255,0.15); color: white; }
+
+.trip-hero-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative; z-index: 1;
+  flex-shrink: 0;
+}
+.trip-undo-btn, .trip-redo-btn {
+  font-size: 14px;
+  width: 32px; height: 32px;
+  display: none;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.trip-undo-btn:not(:disabled):hover, .trip-redo-btn:not(:disabled):hover {
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+.trip-undo-btn:disabled, .trip-redo-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.trip-edit-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.85);
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: all 0.15s;
+}
+.trip-edit-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.trip-edit-btn.is-done {
+  background: white;
+  color: #1A1714;
+  border-color: white;
+}
+.trip-edit-btn.is-done:hover { opacity: 0.88; }
+
+.trip-hero-main { position: relative; z-index: 1; }
+.trip-hero-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.trip-hero-label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+.trip-hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  line-height: 1.15;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  cursor: default;
+  position: relative;
+}
+.trip-hero-title[contenteditable="true"] {
+  cursor: text;
+  border-bottom: 2px dashed rgba(255,255,255,0.3);
+  padding-bottom: 2px;
+  outline: none;
+}
+.trip-hero-title em {
+  font-style: italic;
+  color: rgba(255,255,255,0.55);
+}
+.trip-hero-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.trip-hero-pill {
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.08);
+}
+.trip-hero-pill[contenteditable="true"] {
+  cursor: text;
+  outline: none;
+  border-style: dashed;
+}
+.add-pill-btn {
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px dashed rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.4);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: none;
+}
+.add-pill-btn:hover { border-color: rgba(255,255,255,0.6); color: rgba(255,255,255,0.8); }
+.edit-mode .add-pill-btn { display: inline-flex; }
+.pill-delete-btn {
+  display: none;
+  font-size: 10px;
+  margin-left: 4px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+.edit-mode .pill-delete-btn { display: inline; }
+
+/* EDIT MODE VISIBILITY */
+body:not(.edit-mode) .delete-btn { display: none !important; }
+body:not(.edit-mode) .add-section { display: none !important; }
+body:not(.edit-mode) .add-city-section { display: none !important; }
+body:not(.edit-mode) .add-budget-section-wrap { display: none !important; }
+body:not(.edit-mode) .row-delete-btn { display: none !important; }
+body:not(.edit-mode) .bsec-delete { display: none !important; }
+body:not(.edit-mode) .bsec-edit-name { pointer-events: none; }
+body:not(.edit-mode) .edit-cell { pointer-events: none; user-select: text; }
+body:not(.edit-mode) .add-row-btn { display: none !important; }
+
+.edit-mode .trip-undo-btn,
+.edit-mode .trip-redo-btn {
+  display: flex;
+}
+
+/* Budget checkboxes always work */
+.paid-check { pointer-events: auto !important; }
+
+/* City nav */
+.city-nav-wrap {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.city-nav {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: 1;
+}
+.city-nav::-webkit-scrollbar { display: none; }
+.city-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 14px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  position: relative;
+}
+.city-btn:hover { color: var(--text); }
+.city-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+.city-btn .nights { font-size: 10px; font-weight: 400; color: var(--text3); margin-left: 4px; }
+
+.add-city-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1.5px dashed var(--border);
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  display: none;
+  flex-shrink: 0;
+}
+.edit-mode .add-city-btn { display: flex; align-items: center; gap: 4px; }
+.add-city-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* MAIN */
+.main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+/* CITY PANEL */
+.city-panel { display: none; }
+.city-panel.active { display: block; }
+
+.city-header {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.city-name {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 600;
+  line-height: 1.1;
+  outline: none;
+}
+.city-name[contenteditable="true"] {
+  border-bottom: 2px dashed var(--border);
+  padding-bottom: 2px;
+  cursor: text;
+}
+.city-meta { font-size: 13px; color: var(--text2); margin-top: 4px; outline: none; }
+.city-meta[contenteditable="true"] { cursor: text; border-bottom: 1px dashed var(--border); }
+
+.city-delete-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--red);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: none;
+}
+.edit-mode .city-delete-btn { display: inline-flex; align-items: center; gap: 4px; }
+.city-delete-btn:hover { background: var(--red-light); }
+
+/* TAB NAV */
+.tab-nav {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.tab-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tab-btn:hover { border-color: var(--text3); color: var(--text); }
+.tab-btn.active { background: var(--text); border-color: var(--text); color: white; }
+.tab-btn .count { font-size: 10px; margin-left: 5px; opacity: 0.6; }
+
+/* TAB CONTENT */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* CARDS GRID */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+/* CARD */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+}
+.card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); transform: translateY(-1px); }
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.card-title { font-size: 14px; font-weight: 500; line-height: 1.35; flex: 1; }
+.card-desc { font-size: 13px; color: var(--text2); line-height: 1.65; }
+.card-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.delete-btn {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  opacity: 0;
+}
+.card:hover .delete-btn { opacity: 1; }
+.delete-btn:hover { background: var(--red-light); border-color: var(--red); color: var(--red); opacity: 1; }
+
+/* BADGES */
+.badge {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+.badge-free    { background: var(--accent-light); color: var(--accent); }
+.badge-cheap   { background: var(--gold-light); color: var(--gold); }
+.badge-mid     { background: var(--blue-light); color: var(--blue); }
+.badge-night   { background: var(--purple-light); color: var(--purple); }
+.badge-food    { background: var(--red-light); color: var(--red); }
+.badge-cafe    { background: var(--rose-light); color: var(--rose); }
+.badge-view    { background: var(--teal-light); color: var(--teal); }
+.badge-daytrip { background: var(--plum-light); color: var(--plum); }
+
+/* ADD ITEM */
+.add-section {
+  margin-top: 1.5rem;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.add-toggle {
+  width: 100%;
+  padding: 14px 1.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.15s;
+  text-align: left;
+}
+.add-toggle:hover { background: var(--surface2); color: var(--text); }
+.add-toggle .plus {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  line-height: 1;
+  transition: background 0.15s;
+}
+.add-toggle:hover .plus { background: var(--accent); color: white; }
+
+.add-form {
+  display: none;
+  padding: 1.25rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  gap: 12px;
+  flex-direction: column;
+}
+.add-form.open { display: flex; }
+.add-form input,
+.add-form textarea,
+.add-form select {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  resize: vertical;
+}
+.add-form input:focus, .add-form textarea:focus, .add-form select:focus { border-color: var(--accent); }
+.add-form textarea { min-height: 80px; }
+.add-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.add-form-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* EMPTY */
+.empty { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 13px; }
+
+/* TOP-LEVEL NAV */
+.top-nav-wrap {
+  background: var(--text);
+  padding: 0 1.5rem;
+  display: flex;
+  gap: 0;
+}
+.top-nav-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 11px 18px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.45);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+.top-nav-btn:hover { color: rgba(255,255,255,0.75); }
+.top-nav-btn.active { color: white; border-bottom-color: rgba(255,255,255,0.7); }
+
+/* VIEWS */
+.view { display: none; }
+.view.active { display: block; }
+
+/* BUDGET SECTION */
+.budget-main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+.budget-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+.bsum-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.25rem 1rem;
+}
+.bsum-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); font-weight: 500; margin-bottom: 6px; }
+.bsum-amount { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 600; line-height: 1.1; }
+.bsum-amount.green { color: var(--accent); }
+.bsum-amount.red   { color: var(--red); }
+.bsum-amount.gold  { color: var(--gold); }
+
+/* BUDGET SECTION BLOCK */
+.budget-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+}
+.budget-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  user-select: none;
+  gap: 10px;
+  border-bottom: 1px solid transparent;
+  transition: background 0.15s;
+}
+.budget-section-header:hover { background: var(--surface2); }
+.budget-section-header.open { border-bottom-color: var(--border); }
+.bsec-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.bsec-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+.bsec-title-wrap { flex: 1; min-width: 0; }
+.bsec-name { font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.bsec-edit-name {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  width: 100%;
+  max-width: 240px;
+}
+.bsec-subtitle { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.bsec-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; text-align: right; }
+.bsec-total { font-size: 14px; font-weight: 500; }
+.bsec-paid-of { font-size: 11px; color: var(--text3); }
+.bsec-delete {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.bsec-delete:hover { background: var(--red-light); border-color: var(--red); color: var(--red); }
+.bsec-chevron { font-size: 10px; color: var(--text3); transition: transform 0.2s; }
+.budget-section-header.open .bsec-chevron { transform: rotate(180deg); }
+
+.budget-table-wrap { overflow-x: auto; }
+.budget-table { width: 100%; border-collapse: collapse; }
+.budget-table th {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  font-weight: 500;
+  padding: 8px 8px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+.budget-table td { padding: 10px 8px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+.budget-table tbody tr:last-child td { border-bottom: none; }
+.th-check { width: 32px; }
+.th-amount { text-align: right; min-width: 80px; }
+.td-amount { text-align: right; font-variant-numeric: tabular-nums; }
+.td-check { width: 32px; }
+.edit-cell {
+  border-radius: 4px;
+  padding: 2px 4px;
+  outline: none;
+  min-width: 40px;
+  display: inline-block;
+  transition: background 0.15s;
+}
+.edit-cell:focus { background: var(--surface2); }
+.edit-cell[data-type="amount"] { text-align: right; min-width: 60px; }
+.paid-check { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+.paid-row td { opacity: 0.5; }
+.paid-row td.td-check { opacity: 1; }
+.row-delete-btn {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  opacity: 0;
+}
+.budget-table tr:hover .row-delete-btn { opacity: 1; }
+.row-delete-btn:hover { background: var(--red-light); border-color: var(--red); color: var(--red); opacity: 1; }
+.table-footer-row td { font-size: 13px; font-weight: 500; padding: 10px 8px; border-top: 2px solid var(--border); border-bottom: none; }
+.add-row-btn {
+  width: 100%;
+  padding: 10px 8px;
+  background: transparent;
+  border: none;
+  border-top: 1px dashed var(--border);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s;
+}
+.add-row-btn:hover { color: var(--accent); }
+
+/* ADD BUDGET SECTION */
+.add-budget-section-wrap {
+  margin-top: 1.5rem;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.add-bsec-toggle {
+  width: 100%;
+  padding: 14px 1.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.15s;
+  text-align: left;
+}
+.add-bsec-toggle:hover { background: var(--surface2); color: var(--text); }
+.add-bsec-toggle .plus {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  line-height: 1;
+  transition: background 0.15s;
+}
+.add-bsec-toggle:hover .plus { background: var(--accent); color: white; }
+.add-bsec-form {
+  display: none;
+  padding: 1.25rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  gap: 12px;
+  flex-direction: column;
+}
+.add-bsec-form.open { display: flex; }
+.add-bsec-form input, .add-bsec-form select {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+.add-bsec-form input:focus, .add-bsec-form select:focus { border-color: var(--accent); }
+.add-bsec-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.add-bsec-form-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* PROGRESS BAR */
+.progress-bar-wrap { margin-top: 6px; height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s; }
+
+/* TABLE COLUMNS */
+.col-name { min-width: 140px; }
+.col-detail { min-width: 100px; color: var(--text2); }
+.col-note { min-width: 100px; color: var(--text2); font-size: 12px; }
+
+/* SHARE BAR */
+.share-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.share-bar-left { flex: 1; }
+.share-bar-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+.share-bar-sub { font-size: 12px; color: var(--text2); }
+.share-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.share-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; align-items: center; gap: 5px;
+}
+.share-btn:hover { background: var(--surface2); color: var(--text); }
+.share-btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+.share-btn.primary:hover { opacity: 0.85; }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--text);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 9999;
+  transition: transform 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* SYNC INDICATOR */
+.sync-indicator {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  font-size: 11px;
+  color: var(--text3);
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.sync-indicator.show { opacity: 1; }
+.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.sync-dot.syncing { background: var(--gold); animation: pulse 0.8s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ADD CITY SECTION */
+.add-city-section {
+  margin-top: 2rem;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* THEME PICKER IN TRIP */
+.trip-theme-wrap {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin-top: 1rem;
+  position: relative; z-index: 1;
+}
+.edit-mode .trip-theme-wrap { display: flex; }
+.trip-theme-label { font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 0.12em; text-transform: uppercase; }
+.trip-theme-swatch {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.15s;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.trip-theme-swatch:hover { transform: scale(1.15); }
+.trip-theme-swatch.active { outline-color: rgba(255,255,255,0.7); }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .trip-hero { padding: 1.5rem 1.25rem 1.5rem; }
+  .main { padding: 1.5rem 1rem 3rem; }
+  .city-nav-wrap { padding: 0 1rem; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .add-form-row { grid-template-columns: 1fr; }
+  .city-header { flex-direction: column; align-items: flex-start; }
+  .budget-main { padding: 1.5rem 1rem 3rem; }
+  .add-bsec-form-row { grid-template-columns: 1fr; }
+  .budget-table th.col-detail, .budget-table td.col-detail,
+  .budget-table th.col-note, .budget-table td.col-note { display: none; }
+  .home-body { padding: 1.5rem 1rem 3rem; }
+  .trips-grid { grid-template-columns: 1fr; }
+  .icon-picker { grid-template-columns: repeat(6, 1fr); }
+  .trip-hero-controls { gap: 5px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN SCREEN ===================== -->
+<div class="screen active" id="screen-login">
+  <div id="login-box" class="login-box">
+    <span class="login-logo">✈️</span>
+    <div class="login-title">Trip Planner</div>
+    <div class="login-sub">Plan your adventures, anywhere.</div>
+    <div class="saved-users" id="saved-users-wrap"></div>
+    <input class="login-field" id="username-input" type="text" placeholder="Enter your full name" maxlength="32" autocomplete="off" autocapitalize="none">
+    <button class="login-btn" onclick="doLogin()">Continue →</button>
+    <div class="login-hint">Create an account instantly using only your full name — no email or password required.</div>
+  </div>
+</div>
+
+<!-- ===================== HOME SCREEN ===================== -->
+<div class="screen" id="screen-home">
+  <div class="home-header">
+    <div class="home-header-left">
+      <div class="home-header-label">Trip Planner</div>
+      <div class="home-header-title">Hello, <span id="home-username"></span></div>
+    </div>
+    <div class="home-header-right">
+      <button class="home-logout-btn" onclick="doLogout()">Switch user</button>
+      <button class="home-new-btn" onclick="openNewTripModal()">
+        <span class="plus">+</span> New Trip
+      </button>
+    </div>
+  </div>
+  <div class="home-body">
+    <div class="home-section-label" id="trips-count-label">Your trips</div>
+    <div class="trips-grid" id="trips-grid"></div>
+  </div>
+</div>
+
+<!-- ===================== TRIP SCREEN ===================== -->
+<div class="screen" id="screen-trip">
+  <div class="trip-hero" id="trip-hero">
+    <div class="trip-hero-top">
+      <button class="trip-hero-back" onclick="goHome()">← Trips</button>
+      <div class="trip-hero-controls">
+        <button class="trip-undo-btn" id="undo-btn" onclick="doUndo()" title="Undo" disabled>↩</button>
+        <button class="trip-redo-btn" id="redo-btn" onclick="doRedo()" title="Redo" disabled>↪</button>
+        <button class="trip-edit-btn" id="edit-btn" onclick="toggleEditMode()">Edit</button>
+      </div>
+    </div>
+    <div class="trip-hero-main">
+      <div class="trip-hero-icon" id="trip-icon-display"></div>
+      <div class="trip-hero-label" id="trip-label-display"></div>
+      <div class="trip-hero-title" id="trip-title-display"></div>
+      <div class="trip-hero-pills" id="trip-pills-wrap"></div>
+      <button class="add-pill-btn" onclick="addPill()">+ add tag</button>
+    </div>
+    <div class="trip-theme-wrap" id="trip-theme-wrap"></div>
+  </div>
+
+  <div class="top-nav-wrap">
+    <button class="top-nav-btn active" onclick="switchView('itinerary')">🗺️ Itinerary</button>
+    <button class="top-nav-btn" onclick="switchView('budget')">💶 Budget</button>
+  </div>
+
+  <!-- ITINERARY VIEW -->
+  <div class="view active" id="view-itinerary">
+    <div class="city-nav-wrap">
+      <div class="city-nav" id="cityNav"></div>
+      <button class="add-city-btn" onclick="openAddCityModal()">+ city</button>
+    </div>
+    <div class="main">
+      <div id="cityPanels"></div>
+      <div class="add-city-section" id="add-city-section-bottom">
+        <button class="add-toggle" onclick="openAddCityModal()">
+          <span class="plus">+</span>
+          Add a new city or stop
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUDGET VIEW -->
+  <div class="view" id="view-budget">
+    <div class="budget-main">
+      <div class="share-bar">
+        <div class="share-bar-left">
+          <div class="share-bar-title">Save & Share</div>
+          <div class="share-bar-sub">Download a file to share with your travel crew, or save a copy</div>
+        </div>
+        <div class="share-actions">
+          <button class="share-btn" onclick="exportHTML()">⬇️ Download file</button>
+          <button class="share-btn primary" onclick="shareNative()">⬆️ Share</button>
+        </div>
+      </div>
+      <div class="budget-summary" id="budgetSummary"></div>
+      <div id="budgetSections"></div>
+      <div class="add-budget-section-wrap">
+        <button class="add-bsec-toggle" onclick="toggleAddBSection()">
+          <span class="plus">+</span> Add new budget category
+        </button>
+        <div class="add-bsec-form" id="addBSectionForm">
+          <div class="add-bsec-form-row">
+            <input type="text" id="newSecName" placeholder="Category name (e.g. Museums, Food)" maxlength="60">
+            <select id="newSecIcon">
+              <option value="🏨">🏨 Accommodation</option>
+              <option value="✈️">✈️ Flights</option>
+              <option value="🚌">🚌 Bus</option>
+              <option value="🚆">🚆 Train / Seat Reservation</option>
+              <option value="🎟️">🎟️ Activities</option>
+              <option value="🍽️">🍽️ Food</option>
+              <option value="🛍️">🛍️ Shopping</option>
+              <option value="📍">📍 Coordinates / Routes</option>
+              <option value="📝">📝 Notes</option>
+              <option value="💬">💬 Other</option>
+            </select>
+          </div>
+          <div class="add-bsec-form-row">
+            <input type="text" id="newSecCol1" placeholder="Column 1 label" maxlength="40" value="Description">
+            <input type="text" id="newSecCol2" placeholder="Column 2 label" maxlength="40" value="Details">
+          </div>
+          <div class="add-bsec-form-actions">
+            <button class="btn-cancel" onclick="toggleAddBSection()">Cancel</button>
+            <button class="btn-primary" onclick="addBudgetSection()">Add Category</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODALS ===================== -->
+
+<!-- New Trip Modal -->
+<div class="modal-overlay" id="modal-new-trip">
+  <div class="modal">
+    <div class="modal-title">New Trip</div>
+    <div class="modal-field-label">Trip name</div>
+    <input class="modal-field" id="new-trip-name" placeholder="e.g. Interrail 2026" maxlength="80">
+    <div class="modal-field-label">Label / subtitle</div>
+    <input class="modal-field" id="new-trip-label" placeholder="e.g. Berlin → Cluj" maxlength="80">
+    <div class="modal-field-label">Icon</div>
+    <div class="icon-picker" id="icon-picker"></div>
+    <div class="modal-field-label">Theme colour</div>
+    <div class="theme-picker" id="theme-picker-new"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-new-trip')">Cancel</button>
+      <button class="btn-primary" onclick="createTrip()">Create Trip</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add City Modal -->
+<div class="modal-overlay" id="modal-add-city">
+  <div class="modal">
+    <div class="modal-title">Add City / Stop</div>
+    <div class="modal-field-label">City name</div>
+    <input class="modal-field" id="new-city-name" placeholder="e.g. Lisbon" maxlength="60">
+    <div class="modal-field-label">Dates</div>
+    <input class="modal-field" id="new-city-dates" placeholder="e.g. Jul 5–8" maxlength="60">
+    <div class="modal-field-label">Nights</div>
+    <input class="modal-field" id="new-city-nights" type="number" min="0" placeholder="3" style="max-width:100px">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-add-city')">Cancel</button>
+      <button class="btn-primary" onclick="addCity()">Add City</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Pill Modal -->
+<div class="modal-overlay" id="modal-add-pill">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-title">Add tag</div>
+    <input class="modal-field" id="new-pill-text" placeholder="e.g. 🚂 22 nights" maxlength="40">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-add-pill')">Cancel</button>
+      <button class="btn-primary" onclick="confirmAddPill()">Add</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="sync-indicator" id="sync-indicator">
+  <div class="sync-dot" id="sync-dot"></div>
+  <span id="sync-label">Saved</span>
+</div>
+
+<script>
+/* =============================================================
+   THEMES
+============================================================= */
+const THEMES = [
+  { id:'forest',  bg:'#1A1714', accent:'#2D5A3D', accentLight:'#E8F0EB', cardBg:'#2D5A3D' },
+  { id:'ocean',   bg:'#0D2137', accent:'#1E6FA8', accentLight:'#D8EDFB', cardBg:'#1A4A6B' },
+  { id:'dusk',    bg:'#2A1A2E', accent:'#7B4F9E', accentLight:'#EDE8F5', cardBg:'#4A2E6B' },
+  { id:'rose',    bg:'#2B1520', accent:'#A83860', accentLight:'#F5E8EF', cardBg:'#6B2E4A' },
+  { id:'amber',   bg:'#1E1508', accent:'#A07820', accentLight:'#F5EDD8', cardBg:'#8B6914' },
+  { id:'slate',   bg:'#141820', accent:'#3A6B8B', accentLight:'#D8EAF3', cardBg:'#1A4050' },
+  { id:'sand',    bg:'#251F18', accent:'#9E7A3D', accentLight:'#F5EDD8', cardBg:'#7A5F2A' },
+  { id:'ruby',    bg:'#1E0A0A', accent:'#8B2E2E', accentLight:'#F5EAEA', cardBg:'#6B1A1A' },
+];
+const ICONS = ['✈️','🚆','🗺️','🏕️','🌍','🌏','🌎','⛵','🚗','🏔️','🏖️','🎒','🌴','🏛️','🍜','🎭'];
+
+/* =============================================================
+   STORAGE (cross-device via artifact storage, with localStorage fallback)
+============================================================= */
+let currentUser = null;
+let allTrips = {};  // { tripId: tripData }
+
+// Try to use artifact storage for cross-device sync
+async function cloudGet(key) {
+  try {
+    if (window.storage) {
+      const res = await window.storage.get('tp:' + key);
+      return res ? JSON.parse(res.value) : null;
+    }
+  } catch(e) {}
+  try {
+    const v = localStorage.getItem('tripplanner_' + key);
+    return v ? JSON.parse(v) : null;
+  } catch(e) {}
+  return null;
+}
+
+async function cloudSet(key, value) {
+  const str = JSON.stringify(value);
+  try {
+    if (window.storage) {
+      await window.storage.set('tp:' + key, str);
+    }
+  } catch(e) {}
+  try { localStorage.setItem('tripplanner_' + key, str); } catch(e) {}
+}
+
+async function cloudDelete(key) {
+  try {
+    if (window.storage) await window.storage.delete('tp:' + key);
+  } catch(e) {}
+  try { localStorage.removeItem('tripplanner_' + key); } catch(e) {}
+}
+
+/* =============================================================
+   LOGIN
+============================================================= */
+async function initLogin() {
+  // Load saved usernames for quick-pick
+  const savedUsers = await cloudGet('users') || [];
+  const wrap = document.getElementById('saved-users-wrap');
+  wrap.innerHTML = '';
+
+  savedUsers.forEach(u => {
+    const chip = document.createElement('button');
+    chip.className = 'saved-user-chip';
+    chip.textContent = u;
+    chip.onclick = () => {
+      document.getElementById('username-input').value = u;
+      doLogin();
+    };
+    wrap.appendChild(chip);
+  });
+
+  const inp = document.getElementById('username-input');
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  // AUTO LOGIN:
+  // If a previous session exists, skip the login screen completely
+  try {
+    const session = localStorage.getItem('tp_session');
+
+    if (session) {
+      currentUser = session
+        .toLowerCase()
+        .replace(/[^a-z0-9 ]/g, '')
+        .replace(/\s+/g, '_');
+
+      await loadUserData();
+
+      showScreen('home');
+      renderHome();
+      return;
+    }
+  } catch(e) {}
+}
+
+async function doLogin() {
+  const raw = document.getElementById('username-input').value.trim();
+
+  if (!raw) {
+    document.getElementById('username-input').focus();
+    return;
+  }
+
+  // Preserve the user's real full name
+  const displayName = raw.replace(/\s+/g, ' ').trim();
+
+  // Internal safe account ID
+  const accountId = displayName
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]/g, '')
+    .replace(/\s+/g, '_');
+
+  if (!accountId) {
+    showToast('Please enter a valid full name');
+    return;
+  }
+
+  currentUser = accountId;
+
+  // Save account list
+  const savedUsers = await cloudGet('users') || [];
+
+  if (!savedUsers.includes(displayName)) {
+    savedUsers.push(displayName);
+    await cloudSet('users', savedUsers);
+  }
+
+  // Save session
+  try {
+    localStorage.setItem('tp_session', displayName);
+  } catch(e) {}
+
+  // Save profile info
+  await cloudSet('profile_' + currentUser, {
+    fullName: displayName
+  });
+
+  await loadUserData();
+  showScreen('home');
+  renderHome();
+}
+
+function doLogout() {
+  try { localStorage.removeItem('tp_session'); } catch(e) {}
+  currentUser = null;
+  allTrips = {};
+  document.getElementById('username-input').value = '';
+  showScreen('login');
+}
+
+/* =============================================================
+   DATA MANAGEMENT
+============================================================= */
+async function loadUserData() {
+  const data = await cloudGet('u_' + currentUser) || { trips: {} };
+  allTrips = data.trips || {};
+
+  const profile = await cloudGet('profile_' + currentUser);
+
+  if (profile) {
+    try {
+      localStorage.setItem(
+        'tp_profile_' + currentUser,
+        JSON.stringify(profile)
+      );
+    } catch(e) {}
+  }
+}
+
+function getSaveDebounce() { return 800; }
+let saveTimer = null;
+function scheduleSync() {
+  showSyncDot('syncing');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    await cloudSet('u_' + currentUser, { trips: allTrips });
+    showSyncDot('saved');
+  }, getSaveDebounce());
+}
+
+function showSyncDot(state) {
+  const el = document.getElementById('sync-indicator');
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  el.classList.add('show');
+  if (state === 'syncing') {
+    dot.classList.add('syncing');
+    lbl.textContent = 'Saving…';
+  } else {
+    dot.classList.remove('syncing');
+    lbl.textContent = 'Saved';
+    setTimeout(() => el.classList.remove('show'), 2000);
+  }
+}
+
+/* =============================================================
+   SCREEN MANAGEMENT
+============================================================= */
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = '';
+  });
+
+  const activeScreen = document.getElementById('screen-' + name);
+  activeScreen.classList.add('active');
+
+  if (name !== 'login') {
+    document.getElementById('screen-login').style.display = 'none';
+  } else {
+    document.getElementById('screen-login').style.display = 'flex';
+  }
+}
+
+/* =============================================================
+   HOME SCREEN
+============================================================= */
+function renderHome() {
+  const profile = JSON.parse(localStorage.getItem('tp_profile_' + currentUser) || 'null');
+  document.getElementById('home-username').textContent =
+    profile?.fullName || currentUser.replace(/_/g, ' ');
+  const grid = document.getElementById('trips-grid');
+  const label = document.getElementById('trips-count-label');
+  const ids = Object.keys(allTrips);
+  label.textContent = ids.length === 0 ? 'Your trips' : `Your trips · ${ids.length}`;
+
+  if (ids.length === 0) {
+    grid.innerHTML = `<div class="home-empty" style="grid-column:1/-1">
+      <div class="home-empty-icon">🗺️</div>
+      <div class="home-empty-title">No trips yet</div>
+      <div class="home-empty-sub">Press "New Trip" to get started</div>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = '';
+  ids.forEach(id => {
+    const trip = allTrips[id];
+    const theme = THEMES.find(t => t.id === trip.theme) || THEMES[0];
+    const cityCount = (trip.cities || []).length;
+    const created = trip.created ? new Date(trip.created).toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}) : '';
+
+    const card = document.createElement('div');
+    card.className = 'trip-card';
+    card.innerHTML = `
+      <div class="trip-card-header" style="background:${theme.bg}">
+        <span class="trip-card-icon">${trip.icon || '✈️'}</span>
+        <div class="trip-card-name">${escHtml(trip.name || 'Untitled Trip')}</div>
+        <div class="trip-card-subtitle">${escHtml(trip.label || '')}</div>
+      </div>
+      <div class="trip-card-body">
+        <div class="trip-card-meta">${cityCount} stop${cityCount !== 1 ? 's' : ''} · Created ${created}</div>
+        <button class="trip-card-delete" onclick="event.stopPropagation(); deleteTrip('${id}')" title="Delete trip">×</button>
+      </div>`;
+    card.querySelector('.trip-card-header').onclick = () => openTrip(id);
+    grid.appendChild(card);
+  });
+}
+
+function openNewTripModal() {
+  buildIconPicker('icon-picker', null);
+  buildThemePicker('theme-picker-new', THEMES[0].id);
+  document.getElementById('new-trip-name').value = '';
+  document.getElementById('new-trip-label').value = '';
+  document.getElementById('modal-new-trip').classList.add('open');
+  setTimeout(() => document.getElementById('new-trip-name').focus(), 50);
+}
+
+function createTrip() {
+  const name = document.getElementById('new-trip-name').value.trim();
+  if (!name) { document.getElementById('new-trip-name').focus(); return; }
+  const label = document.getElementById('new-trip-label').value.trim();
+  const selectedIcon = document.querySelector('#icon-picker .icon-opt.selected');
+  const icon = selectedIcon ? selectedIcon.dataset.icon : '✈️';
+  const selectedTheme = document.querySelector('#theme-picker-new .theme-opt.selected');
+  const theme = selectedTheme ? selectedTheme.dataset.theme : THEMES[0].id;
+
+  const id = 'trip_' + Date.now();
+  allTrips[id] = {
+    id, name, label, icon, theme,
+    created: Date.now(),
+    pills: [],
+    cities: [],
+    budget: []
+  };
+
+  closeModal('modal-new-trip');
+  scheduleSync();
+  openTrip(id);
+}
+
+function deleteTrip(id) {
+  if (!confirm('Delete this trip and all its data?')) return;
+  delete allTrips[id];
+  scheduleSync();
+  renderHome();
+}
+
+/* =============================================================
+   TRIP SCREEN
+============================================================= */
+let currentTripId = null;
+let editMode = false;
+let undoStack = [];
+let redoStack = [];
+
+function pushUndo() {
+  if (!currentTripId || !allTrips[currentTripId]) return;
+  undoStack.push(JSON.stringify(allTrips[currentTripId]));
+  if (undoStack.length > 100) undoStack.shift();
+  redoStack = [];
+  updateUndoRedo();
+}
+
+function doUndo() {
+  if (!undoStack.length || !currentTripId) return;
+  redoStack.push(JSON.stringify(allTrips[currentTripId]));
+  const previous = undoStack.pop();
+  if (previous) {
+    allTrips[currentTripId] = JSON.parse(previous);
+    renderTripHero();
+    loadItinerary();
+    buildUI();
+    renderBudget();
+    scheduleSync();
+  }
+  updateUndoRedo();
+}
+
+function doRedo() {
+  if (!redoStack.length || !currentTripId) return;
+  undoStack.push(JSON.stringify(allTrips[currentTripId]));
+  const next = redoStack.pop();
+  if (next) {
+    allTrips[currentTripId] = JSON.parse(next);
+    renderTripHero();
+    loadItinerary();
+    buildUI();
+    renderBudget();
+    scheduleSync();
+  }
+  updateUndoRedo();
+}
+
+function updateUndoRedo() {
+  const undoBtn = document.getElementById('undo-btn');
+  const redoBtn = document.getElementById('redo-btn');
+  if (!undoBtn || !redoBtn) return;
+  undoBtn.disabled = undoStack.length === 0;
+  redoBtn.disabled = redoStack.length === 0;
+}
+
+
+function openTrip(id) {
+  currentTripId = id;
+  editMode = false;
+  undoStack = [];
+  redoStack = [];
+  showScreen('trip');
+  renderTripHero();
+  loadItinerary();
+  buildUI();
+  renderBudget();
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-itinerary').classList.add('active');
+  document.querySelectorAll('.top-nav-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+  body().classList.remove('edit-mode');
+  document.getElementById('edit-btn').textContent = 'Edit';
+  document.getElementById('edit-btn').classList.remove('is-done');
+  updateUndoRedo();
+}
+
+function body() { return document.body; }
+
+function getTrip() { return allTrips[currentTripId]; }
+
+function renderTripHero() {
+  const trip = getTrip();
+  if (!trip) return;
+  const theme = THEMES.find(t => t.id === trip.theme) || THEMES[0];
+  document.getElementById('trip-hero').style.background = theme.bg;
+
+  document.getElementById('trip-icon-display').textContent = trip.icon || '✈️';
+  document.getElementById('trip-label-display').textContent = trip.label || '';
+
+  const titleEl = document.getElementById('trip-title-display');
+  titleEl.textContent = trip.name || 'Untitled Trip';
+  titleEl.contentEditable = 'false';
+  titleEl.onblur = null;
+
+  renderPills();
+  buildTripThemeSwitcher();
+}
+
+function renderPills() {
+  const trip = getTrip();
+  const wrap = document.getElementById('trip-pills-wrap');
+  wrap.innerHTML = '';
+  (trip.pills || []).forEach((p, i) => {
+    const span = document.createElement('span');
+    span.className = 'trip-hero-pill';
+    span.innerHTML = escHtml(p) + (editMode ? `<span class="pill-delete-btn" onclick="deletePill(${i})">✕</span>` : '');
+    if (editMode) span.contentEditable = 'true';
+    span.onblur = () => { if (editMode) { savePillEdit(i, span.childNodes[0].textContent || span.textContent.replace('✕','').trim()); } };
+    wrap.appendChild(span);
+  });
+}
+
+function addPill() {
+  document.getElementById('new-pill-text').value = '';
+  document.getElementById('modal-add-pill').classList.add('open');
+  setTimeout(() => document.getElementById('new-pill-text').focus(), 50);
+}
+
+function confirmAddPill() {
+  const val = document.getElementById('new-pill-text').value.trim();
+  if (!val) return;
+  const trip = getTrip();
+  pushUndo();
+  trip.pills = trip.pills || [];
+  trip.pills.push(val);
+  closeModal('modal-add-pill');
+  renderPills();
+  scheduleSync();
+}
+
+function deletePill(i) {
+  pushUndo();
+  const trip = getTrip();
+  trip.pills.splice(i, 1);
+  renderPills();
+  scheduleSync();
+}
+
+function savePillEdit(i, val) {
+  const trip = getTrip();
+  if (val && val !== trip.pills[i]) {
+    trip.pills[i] = val;
+    scheduleSync();
+  }
+}
+
+function buildTripThemeSwitcher() {
+  const trip = getTrip();
+  const wrap = document.getElementById('trip-theme-wrap');
+  wrap.innerHTML = '<span class="trip-theme-label">Theme</span>';
+  THEMES.forEach(th => {
+    const sw = document.createElement('div');
+    sw.className = 'trip-theme-swatch' + (trip.theme === th.id ? ' active' : '');
+    sw.style.background = th.bg;
+    sw.style.border = `3px solid ${th.cardBg}`;
+    sw.dataset.theme = th.id;
+    sw.title = th.id;
+    sw.onclick = () => {
+      trip.theme = th.id;
+      document.querySelectorAll('.trip-theme-swatch').forEach(s => s.classList.toggle('active', s.dataset.theme === th.id));
+      document.getElementById('trip-hero').style.background = th.bg;
+      scheduleSync();
+      renderHome(); // update card colour
+    };
+    wrap.appendChild(sw);
+  });
+}
+
+function goHome() {
+  if (editMode) {
+    if (!confirm('Exit edit mode and return home?')) return;
+    toggleEditMode();
+  }
+  showScreen('home');
+  renderHome();
+}
+
+/* =============================================================
+   EDIT MODE
+============================================================= */
+function toggleEditMode() {
+  editMode = !editMode;
+  body().classList.toggle('edit-mode', editMode);
+  const btn = document.getElementById('edit-btn');
+  btn.textContent = editMode ? 'Done' : 'Edit';
+  btn.classList.toggle('is-done', editMode);
+
+  // Make title editable
+  const titleEl = document.getElementById('trip-title-display');
+  titleEl.contentEditable = editMode ? 'true' : 'false';
+  if (editMode) {
+    titleEl.onblur = () => {
+      const trip = getTrip();
+      const newVal = titleEl.textContent.trim();
+      if (newVal && newVal !== trip.name) {
+        trip.name = newVal;
+        scheduleSync();
+        renderHome();
+      }
+    };
+    titleEl.focus();
+  } else {
+    titleEl.onblur = null;
+  }
+
+  renderPills();
+  // Rebuild panels to show/hide edit features
+  buildUI();
+  renderBudget();
+}
+
+/* =============================================================
+   UNDO / REDO
+============================================================= */
+function pushUndo() {
+  const trip = getTrip();
+  undoStack.push(JSON.stringify(trip));
+  if (undoStack.length > 50) undoStack.shift();
+  redoStack = [];
+  updateUndoRedo();
+}
+
+function doUndo() {
+  if (!undoStack.length) return;
+  const trip = getTrip();
+  redoStack.push(JSON.stringify(trip));
+  const prev = JSON.parse(undoStack.pop());
+  Object.assign(allTrips[currentTripId], prev);
+  updateUndoRedo();
+  renderTripHero();
+  loadItinerary(); buildUI(); renderBudget();
+  scheduleSync();
+  showToast('Undone');
+}
+
+function doRedo() {
+  if (!redoStack.length) return;
+  const trip = getTrip();
+  undoStack.push(JSON.stringify(trip));
+  const next = JSON.parse(redoStack.pop());
+  Object.assign(allTrips[currentTripId], next);
+  updateUndoRedo();
+  renderTripHero();
+  loadItinerary(); buildUI(); renderBudget();
+  scheduleSync();
+  showToast('Redone');
+}
+
+function updateUndoRedo() {
+  document.getElementById('undo-btn').disabled = undoStack.length === 0;
+  document.getElementById('redo-btn').disabled = redoStack.length === 0;
+}
+
+/* =============================================================
+   ITINERARY
+============================================================= */
+const TABS = ["sights","views","food","cafes","nightlife","daytrips"];
+const TAB_LABELS = {
+  sights:"Sights", views:"Viewpoints", food:"Food & Drink",
+  cafes:"Cafés", nightlife:"Nightlife", daytrips:"Day Trips"
+};
+const BADGE_CLASS = {
+  free:"badge-free", cheap:"badge-cheap", mid:"badge-mid", night:"badge-night",
+  food:"badge-food", cafe:"badge-cafe", view:"badge-view", daytrip:"badge-daytrip"
+};
+const BADGE_LABEL = {
+  free:"Free", cheap:"Budget", mid:"€€", night:"Night Out",
+  food:"Food", cafe:"Café", view:"Viewpoint", daytrip:"Day Trip"
+};
+
+let activeCity = null;
+let activeTabs = {};
+
+function getCities() { return getTrip().cities || []; }
+
+function loadItinerary() {
+  activeCity = getCities().length > 0 ? getCities()[0].id : null;
+  activeTabs = {};
+}
+
+function renderCard(item, cityId, tab, idx) {
+  const bc = BADGE_CLASS[item.badge] || 'badge-free';
+  const bl = BADGE_LABEL[item.badge] || item.badge;
+  return `
+    <div class="card" id="card-${cityId}-${tab}-${idx}">
+      <div class="card-top">
+        <div class="card-title">${escHtml(item.title)}</div>
+        <div class="card-actions">
+          <span class="badge ${bc}">${bl}</span>
+          <button class="delete-btn" onclick="deleteItem('${cityId}','${tab}',${idx})" title="Remove">×</button>
+        </div>
+      </div>
+      <div class="card-desc">${escHtml(item.desc)}</div>
+    </div>`;
+}
+
+function renderAddForm(cityId, tab) {
+  return `
+    <div class="add-section">
+      <button class="add-toggle" onclick="toggleAddForm('${cityId}','${tab}')">
+        <span class="plus">+</span>
+        Add something to ${TAB_LABELS[tab].toLowerCase()}
+      </button>
+      <div class="add-form" id="addform-${cityId}-${tab}">
+        <div class="add-form-row">
+          <input type="text" id="add-title-${cityId}-${tab}" placeholder="Name or title" maxlength="120">
+          <select id="add-badge-${cityId}-${tab}">
+            ${Object.entries(BADGE_LABEL).map(([k,v]) => `<option value="${k}">${v}</option>`).join('')}
+          </select>
+        </div>
+        <textarea id="add-desc-${cityId}-${tab}" placeholder="Description, tips, price…"></textarea>
+        <div class="add-form-actions">
+          <button class="btn-cancel" onclick="toggleAddForm('${cityId}','${tab}')">Cancel</button>
+          <button class="btn-primary" onclick="addItem('${cityId}','${tab}')">Add</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderCityPanel(city) {
+  const firstTab = TABS.find(t => city[t] && city[t].length > 0) || TABS[0];
+  const currentTab = activeTabs[city.id] || firstTab;
+
+  let html = `<div class="city-header">
+    <div>
+      <div class="city-name" id="cname-${city.id}" ${editMode?'contenteditable="true"':''} onblur="if(window.editMode)updateCityField('${city.id}','name',this.textContent)">${escHtml(city.name)}</div>
+      <div class="city-meta" id="cmeta-${city.id}" ${editMode?'contenteditable="true"':''} onblur="if(window.editMode)updateCityField('${city.id}','dates',this.textContent)">${escHtml(city.dates||'')}${city.nights?` · ${city.nights} night${city.nights>1?'s':''}`:''}</div>
+    </div>
+    <button class="city-delete-btn" onclick="deleteCity('${city.id}')">✕ Remove city</button>
+  </div>`;
+
+  html += `<div class="tab-nav">`;
+  TABS.forEach(tab => {
+    const items = city[tab] || [];
+    const active = tab === currentTab ? ' active' : '';
+    html += `<button class="tab-btn${active}" onclick="switchTab('${city.id}','${tab}')">${TAB_LABELS[tab]}<span class="count">${items.length}</span></button>`;
+  });
+  html += `</div>`;
+
+  TABS.forEach(tab => {
+    const items = city[tab] || [];
+    const active = tab === currentTab ? ' active' : '';
+    html += `<div class="tab-content${active}" id="tab-${city.id}-${tab}">`;
+    if (items.length === 0) {
+      html += `<div class="empty">Nothing here yet — add something below.</div>`;
+    } else {
+      html += `<div class="cards-grid">`;
+      items.forEach((item, idx) => { html += renderCard(item, city.id, tab, idx); });
+      html += `</div>`;
+    }
+    html += renderAddForm(city.id, tab);
+    html += `</div>`;
+  });
+
+  return html;
+}
+
+function buildUI() {
+  const trip = getTrip();
+  const cities = getCities();
+  if (!activeCity && cities.length > 0) activeCity = cities[0].id;
+
+  const nav = document.getElementById('cityNav');
+  const panels = document.getElementById('cityPanels');
+  nav.innerHTML = '';
+  panels.innerHTML = '';
+
+  cities.forEach(city => {
+    const btn = document.createElement('button');
+    btn.className = 'city-btn' + (city.id === activeCity ? ' active' : '');
+    btn.innerHTML = `${escHtml(city.name)}<span class="nights">${city.nights||0}n</span>`;
+    btn.onclick = () => switchCity(city.id);
+    nav.appendChild(btn);
+
+    const panel = document.createElement('div');
+    panel.className = 'city-panel' + (city.id === activeCity ? ' active' : '');
+    panel.id = 'panel-' + city.id;
+    panel.innerHTML = renderCityPanel(city);
+    panels.appendChild(panel);
+  });
+
+  if (cities.length === 0) {
+    panels.innerHTML = `<div class="empty" style="padding:4rem 1rem">
+      <div style="font-size:2rem;margin-bottom:1rem">🗺️</div>
+      <div style="font-size:16px;color:var(--text2);font-weight:500;margin-bottom:0.5rem">No cities yet</div>
+      <div>Press Edit, then add your first city or stop.</div>
+    </div>`;
+  }
+}
+
+function switchCity(id) {
+  activeCity = id;
+  document.querySelectorAll('.city-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim().startsWith(getCities().find(c=>c.id===id)?.name||''));
+  });
+  document.querySelectorAll('.city-panel').forEach(p => {
+    p.classList.toggle('active', p.id === 'panel-' + id);
+  });
+  const activeBtnEl = document.querySelector('.city-btn.active');
+  if (activeBtnEl) activeBtnEl.scrollIntoView({block:'nearest',inline:'center'});
+}
+
+function switchTab(cityId, tab) {
+  activeTabs[cityId] = tab;
+  const panel = document.getElementById('panel-' + cityId);
+  panel.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim().startsWith(TAB_LABELS[tab]));
+  });
+  TABS.forEach(t => {
+    const el = document.getElementById(`tab-${cityId}-${t}`);
+    if (el) el.classList.toggle('active', t === tab);
+  });
+}
+
+function toggleAddForm(cityId, tab) {
+  const form = document.getElementById(`addform-${cityId}-${tab}`);
+  form.classList.toggle('open');
+  if (form.classList.contains('open')) document.getElementById(`add-title-${cityId}-${tab}`).focus();
+}
+
+function addItem(cityId, tab) {
+  const titleEl = document.getElementById(`add-title-${cityId}-${tab}`);
+  const descEl = document.getElementById(`add-desc-${cityId}-${tab}`);
+  const badgeEl = document.getElementById(`add-badge-${cityId}-${tab}`);
+  const title = titleEl.value.trim();
+  const desc = descEl.value.trim();
+  const badge = badgeEl.value;
+  if (!title) { titleEl.focus(); return; }
+
+  pushUndo();
+  const city = getCities().find(c => c.id === cityId);
+  if (!city[tab]) city[tab] = [];
+  city[tab].push({ title, desc, badge });
+
+  titleEl.value = '';
+  descEl.value = '';
+
+  const tabEl = document.getElementById(`tab-${cityId}-${tab}`);
+  const currentTab = activeTabs[cityId] || tab;
+  tabEl.className = `tab-content${tab === currentTab ? ' active' : ''}`;
+  tabEl.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'cards-grid';
+  city[tab].forEach((item, idx) => { grid.innerHTML += renderCard(item, cityId, tab, idx); });
+  tabEl.appendChild(grid);
+  tabEl.innerHTML += renderAddForm(cityId, tab);
+  updateTabCount(cityId, tab, city[tab].length);
+  scheduleSync();
+  showToast('Added!');
+}
+
+function deleteItem(cityId, tab, idx) {
+  pushUndo();
+  const city = getCities().find(c => c.id === cityId);
+  city[tab].splice(idx, 1);
+  const tabEl = document.getElementById(`tab-${cityId}-${tab}`);
+  const currentTab = activeTabs[cityId] || tab;
+  tabEl.className = `tab-content${tab === currentTab ? ' active' : ''}`;
+  tabEl.innerHTML = '';
+  if (city[tab].length === 0) {
+    tabEl.innerHTML = `<div class="empty">Nothing here yet — add something below.</div>`;
+  } else {
+    const grid = document.createElement('div');
+    grid.className = 'cards-grid';
+    city[tab].forEach((item, i) => { grid.innerHTML += renderCard(item, cityId, tab, i); });
+    tabEl.appendChild(grid);
+  }
+  tabEl.innerHTML += renderAddForm(cityId, tab);
+  updateTabCount(cityId, tab, city[tab].length);
+  scheduleSync();
+}
+
+function updateTabCount(cityId, tab, count) {
+  const panel = document.getElementById('panel-' + cityId);
+  if (!panel) return;
+  panel.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.textContent.trim().startsWith(TAB_LABELS[tab])) {
+      b.innerHTML = `${TAB_LABELS[tab]}<span class="count">${count}</span>`;
+    }
+  });
+}
+
+function updateCityField(cityId, field, val) {
+  const city = getCities().find(c => c.id === cityId);
+  if (!city) return;
+  const newVal = val.trim();
+  if (newVal && newVal !== city[field]) {
+    city[field] = newVal;
+    scheduleSync();
+    // Rebuild nav button
+    const nav = document.getElementById('cityNav');
+    const btns = nav.querySelectorAll('.city-btn');
+    const idx = getCities().findIndex(c => c.id === cityId);
+    if (btns[idx]) btns[idx].innerHTML = `${escHtml(city.name)}<span class="nights">${city.nights||0}n</span>`;
+  }
+}
+
+function openAddCityModal() {
+  document.getElementById('new-city-name').value = '';
+  document.getElementById('new-city-dates').value = '';
+  document.getElementById('new-city-nights').value = '';
+  document.getElementById('modal-add-city').classList.add('open');
+  setTimeout(() => document.getElementById('new-city-name').focus(), 50);
+}
+
+function addCity() {
+  const name = document.getElementById('new-city-name').value.trim();
+  if (!name) { document.getElementById('new-city-name').focus(); return; }
+  const dates = document.getElementById('new-city-dates').value.trim();
+  const nights = parseInt(document.getElementById('new-city-nights').value) || 0;
+
+  pushUndo();
+  const trip = getTrip();
+  if (!trip.cities) trip.cities = [];
+  const id = 'city_' + Date.now();
+  trip.cities.push({ id, name, dates, nights, sights:[], views:[], food:[], cafes:[], nightlife:[], daytrips:[] });
+
+  closeModal('modal-add-city');
+  scheduleSync();
+  activeCity = id;
+  buildUI();
+  switchCity(id);
+  showToast(`${name} added!`);
+}
+
+function deleteCity(id) {
+  if (!confirm('Remove this city and all its content?')) return;
+  pushUndo();
+  const trip = getTrip();
+  trip.cities = trip.cities.filter(c => c.id !== id);
+  activeCity = trip.cities.length > 0 ? trip.cities[0].id : null;
+  scheduleSync();
+  buildUI();
+}
+
+/* =============================================================
+   BUDGET
+============================================================= */
+function getBudget() {
+  const trip = getTrip();
+  if (!trip.budget) trip.budget = [];
+  return trip.budget;
+}
+
+function saveBudget() { scheduleSync(); }
+
+function calcSummary() {
+  let total = 0, paid = 0, owed = 0;
+  getBudget().forEach(sec => {
+    sec.rows.forEach(r => {
+      const amt = parseFloat(r.amount) || 0;
+      total += amt;
+      if (r.paid) paid += amt; else owed += amt;
+    });
+  });
+  return { total, paid, owed };
+}
+
+function renderSummary() {
+  const { total, paid, owed } = calcSummary();
+  const pct = total > 0 ? Math.round((paid / total) * 100) : 0;
+  document.getElementById('budgetSummary').innerHTML = `
+    <div class="bsum-card"><div class="bsum-label">Total Budget</div><div class="bsum-amount">€${total.toFixed(2)}</div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div></div>
+    <div class="bsum-card"><div class="bsum-label">Already Paid</div><div class="bsum-amount green">€${paid.toFixed(2)}</div></div>
+    <div class="bsum-card"><div class="bsum-label">Still to Pay</div><div class="bsum-amount red">€${owed.toFixed(2)}</div></div>
+    <div class="bsum-card"><div class="bsum-label">Paid So Far</div><div class="bsum-amount gold">${pct}%</div></div>`;
+}
+
+function renderBudget() {
+  renderSummary();
+  const container = document.getElementById('budgetSections');
+  container.innerHTML = '';
+  getBudget().forEach((sec, si) => { container.appendChild(buildSection(sec, si)); });
+}
+
+function buildSection(sec, si) {
+  const secTotal = sec.rows.reduce((s, r) => s + (parseFloat(r.amount)||0), 0);
+  const secPaid = sec.rows.filter(r=>r.paid).reduce((s,r) => s+(parseFloat(r.amount)||0), 0);
+  const secOwed = secTotal - secPaid;
+  const isOpen = sec._open !== false;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'budget-section';
+  wrap.id = 'bsec-' + sec.id;
+
+  wrap.innerHTML = `
+    <div class="budget-section-header ${isOpen?'open':''}" id="bsec-hdr-${sec.id}" onclick="toggleBSection('${sec.id}')">
+      <div class="bsec-left">
+        <div class="bsec-icon" style="background:var(--surface2)">${sec.icon}</div>
+        <div class="bsec-title-wrap">
+          <div class="bsec-name">
+            <input class="bsec-edit-name" value="${escHtml(sec.name)}" onclick="event.stopPropagation()" onchange="renameBSection('${sec.id}',this.value)" onblur="renameBSection('${sec.id}',this.value)">
+          </div>
+          <div class="bsec-subtitle">${sec.rows.length} item${sec.rows.length!==1?'s':''} · ${escHtml(sec.col1)}, ${escHtml(sec.col2)}</div>
+        </div>
+      </div>
+      <div class="bsec-right">
+        <div><div class="bsec-total">€${secTotal.toFixed(2)}</div><div class="bsec-paid-of">€${secPaid.toFixed(2)} paid · €${secOwed.toFixed(2)} owed</div></div>
+        <button class="bsec-delete" onclick="event.stopPropagation();deleteBSection('${sec.id}')" title="Delete">×</button>
+        <div class="bsec-chevron">▼</div>
+      </div>
+    </div>
+    <div class="budget-table-wrap" id="bsec-body-${sec.id}" style="${isOpen?'':'display:none'}">
+      <table class="budget-table">
+        <thead><tr><th class="th-check">✓</th><th class="col-name">${escHtml(sec.col1)}</th><th class="col-detail">${escHtml(sec.col2)}</th><th class="col-note">Notes</th><th class="th-amount">Amount (€)</th><th style="width:32px"></th></tr></thead>
+        <tbody id="bsec-tbody-${sec.id}">
+          ${sec.rows.map((r,ri) => buildRowHTML(sec.id, r, ri)).join('')}
+        </tbody>
+        <tfoot><tr class="table-footer-row"><td colspan="4" style="color:var(--text2);font-size:12px">Total</td><td class="td-amount" id="bsec-total-${sec.id}">€${secTotal.toFixed(2)}</td><td></td></tr></tfoot>
+      </table>
+      <button class="add-row-btn" onclick="addBRow('${sec.id}')"><span style="font-size:15px;line-height:1">+</span> Add row</button>
+    </div>`;
+  return wrap;
+}
+
+function buildRowHTML(secId, r, ri) {
+  const paidClass = r.paid ? ' paid-row' : '';
+  return `<tr id="brow-${secId}-${r.id}" class="${paidClass}">
+    <td class="td-check"><input type="checkbox" class="paid-check" ${r.paid?'checked':''} onchange="toggleRowPaid('${secId}','${r.id}',this.checked)"></td>
+    <td class="col-name"><span class="edit-cell" contenteditable="true" onblur="updateRowField('${secId}','${r.id}','name',this.innerText)">${escHtml(r.name||'')}</span></td>
+    <td class="col-detail"><span class="edit-cell" contenteditable="true" onblur="updateRowField('${secId}','${r.id}','detail',this.innerText)">${escHtml(r.detail||'')}</span></td>
+    <td class="col-note"><span class="edit-cell" contenteditable="true" onblur="updateRowField('${secId}','${r.id}','note',this.innerText)">${escHtml(r.note||'')}</span></td>
+    <td class="td-amount"><span class="edit-cell" contenteditable="true" data-type="amount" style="text-align:right" onblur="updateRowAmount('${secId}','${r.id}',this.innerText)">${r.amount||0}</span></td>
+    <td style="width:32px"><button class="row-delete-btn" onclick="deleteBRow('${secId}','${r.id}')" title="Remove">×</button></td>
+  </tr>`;
+}
+
+function toggleBSection(id) {
+  const sec = getBudget().find(s=>s.id===id);
+  sec._open = !(sec._open !== false);
+  const hdr = document.getElementById('bsec-hdr-'+id);
+  const bdy = document.getElementById('bsec-body-'+id);
+  hdr.classList.toggle('open', sec._open);
+  bdy.style.display = sec._open ? '' : 'none';
+  saveBudget();
+}
+
+function renameBSection(id, val) {
+  const sec = getBudget().find(s=>s.id===id);
+  if (sec) { sec.name = val.trim() || sec.name; saveBudget(); renderSummary(); }
+}
+
+function deleteBSection(id) {
+  if (!confirm('Delete this category and all its rows?')) return;
+  const trip = getTrip();
+  trip.budget = trip.budget.filter(s=>s.id!==id);
+  saveBudget(); renderBudget();
+}
+
+function toggleRowPaid(secId, rowId, checked) {
+  const sec = getBudget().find(s=>s.id===secId);
+  const row = sec.rows.find(r=>r.id===rowId);
+  row.paid = checked;
+  const tr = document.getElementById('brow-'+secId+'-'+rowId);
+  if (checked) tr.classList.add('paid-row'); else tr.classList.remove('paid-row');
+  saveBudget(); updateSectionTotals(secId); renderSummary();
+}
+
+function updateRowField(secId, rowId, field, val) {
+  const sec = getBudget().find(s=>s.id===secId);
+  const row = sec.rows.find(r=>r.id===rowId);
+  row[field] = val.trim();
+  saveBudget();
+}
+
+function updateRowAmount(secId, rowId, val) {
+  const sec = getBudget().find(s=>s.id===secId);
+  const row = sec.rows.find(r=>r.id===rowId);
+  row.amount = parseFloat(val.replace(/[^0-9.]/g,'')) || 0;
+  saveBudget(); updateSectionTotals(secId); renderSummary();
+}
+
+function updateSectionTotals(secId) {
+  const sec = getBudget().find(s=>s.id===secId);
+  const total = sec.rows.reduce((s,r)=>s+(parseFloat(r.amount)||0),0);
+  const paid = sec.rows.filter(r=>r.paid).reduce((s,r)=>s+(parseFloat(r.amount)||0),0);
+  const owed = total - paid;
+  const totalEl = document.getElementById('bsec-total-'+secId);
+  if (totalEl) totalEl.textContent = '€'+total.toFixed(2);
+  const hdr = document.getElementById('bsec-hdr-'+secId);
+  if (hdr) {
+    hdr.querySelector('.bsec-total').textContent = '€'+total.toFixed(2);
+    hdr.querySelector('.bsec-paid-of').textContent = '€'+paid.toFixed(2)+' paid · €'+owed.toFixed(2)+' owed';
+  }
+}
+
+function addBRow(secId) {
+  const sec = getBudget().find(s=>s.id===secId);
+  const newId = 'r' + Date.now();
+  sec.rows.push({ id: newId, name: '', detail: '', note: '', amount: 0, paid: false });
+  saveBudget();
+  const tbody = document.getElementById('bsec-tbody-'+secId);
+  const dummy = document.createElement('tbody');
+  dummy.innerHTML = buildRowHTML(secId, sec.rows[sec.rows.length-1], sec.rows.length-1);
+  tbody.appendChild(dummy.firstChild);
+  updateSectionTotals(secId); renderSummary();
+  setTimeout(() => {
+    const newTr = document.getElementById('brow-'+secId+'-'+newId);
+    if (newTr) { const cell = newTr.querySelector('.edit-cell'); if(cell) cell.focus(); }
+  }, 50);
+}
+
+function deleteBRow(secId, rowId) {
+  const sec = getBudget().find(s=>s.id===secId);
+  sec.rows = sec.rows.filter(r=>r.id!==rowId);
+  const tr = document.getElementById('brow-'+secId+'-'+rowId);
+  if (tr) tr.remove();
+  saveBudget(); updateSectionTotals(secId); renderSummary();
+}
+
+function toggleAddBSection() {
+  const form = document.getElementById('addBSectionForm');
+  form.classList.toggle('open');
+  if (form.classList.contains('open')) document.getElementById('newSecName').focus();
+}
+
+function addBudgetSection() {
+  const name = document.getElementById('newSecName').value.trim();
+  const icon = document.getElementById('newSecIcon').value;
+  const col1 = document.getElementById('newSecCol1').value.trim() || 'Description';
+  const col2 = document.getElementById('newSecCol2').value.trim() || 'Details';
+  if (!name) { document.getElementById('newSecName').focus(); return; }
+  const id = 'sec_' + Date.now();
+  const trip = getTrip();
+  if (!trip.budget) trip.budget = [];
+  trip.budget.push({ id, name, icon, col1, col2, rows: [], _open: true });
+  saveBudget(); renderBudget();
+  toggleAddBSection();
+  document.getElementById('newSecName').value = '';
+  showToast('Category "'+name+'" added');
+}
+
+/* =============================================================
+   VIEW SWITCHING
+============================================================= */
+function switchView(view) {
+  document.querySelectorAll('.view').forEach(el => el.classList.toggle('active', el.id === 'view-'+view));
+  document.querySelectorAll('.top-nav-btn').forEach((b,i) => {
+    const views = ['itinerary','budget'];
+    b.classList.toggle('active', views[i] === view);
+  });
+  if (view === 'budget') { renderBudget(); }
+}
+
+/* =============================================================
+   SHARE / EXPORT
+============================================================= */
+function shareNative() {
+  const trip = getTrip();
+  if (navigator.share) {
+    navigator.share({ title: trip.name, text: trip.label || '' }).catch(()=>{});
+  } else {
+    exportHTML();
+  }
+}
+
+function exportHTML() {
+  const html = document.documentElement.outerHTML;
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const trip = getTrip();
+  a.download = (trip ? trip.name.replace(/[^a-z0-9]/gi,'_').toLowerCase() : 'trip') + '.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast('Downloaded!');
+}
+
+/* =============================================================
+   MODAL HELPERS
+============================================================= */
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// Enter key for modals
+document.getElementById('new-trip-name').addEventListener('keydown', e => { if (e.key === 'Enter') createTrip(); });
+document.getElementById('new-city-name').addEventListener('keydown', e => { if (e.key === 'Enter') addCity(); });
+document.getElementById('new-pill-text').addEventListener('keydown', e => { if (e.key === 'Enter') confirmAddPill(); });
+
+/* =============================================================
+   ICON & THEME PICKERS
+============================================================= */
+function buildIconPicker(containerId, selectedIcon) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  let firstSelected = false;
+  ICONS.forEach((icon, i) => {
+    const div = document.createElement('div');
+    div.className = 'icon-opt' + ((!selectedIcon && i === 0) || icon === selectedIcon ? ' selected' : '');
+    if ((!selectedIcon && i === 0) || icon === selectedIcon) firstSelected = true;
+    div.textContent = icon;
+    div.dataset.icon = icon;
+    div.onclick = () => {
+      container.querySelectorAll('.icon-opt').forEach(o => o.classList.remove('selected'));
+      div.classList.add('selected');
+    };
+    container.appendChild(div);
+  });
+}
+
+function buildThemePicker(containerId, selectedId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  THEMES.forEach(th => {
+    const div = document.createElement('div');
+    div.className = 'theme-opt' + (th.id === selectedId ? ' selected' : '');
+    div.style.background = th.bg;
+    div.style.border = `3px solid ${th.cardBg}`;
+    div.dataset.theme = th.id;
+    div.title = th.id;
+    div.onclick = () => {
+      container.querySelectorAll('.theme-opt').forEach(o => o.classList.remove('selected'));
+      div.classList.add('selected');
+    };
+    container.appendChild(div);
+  });
+}
+
+/* =============================================================
+   UTILS
+============================================================= */
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* =============================================================
+   SEED DATA (Interrail 2026 pre-loaded)
+============================================================= */
+const INTERRAIL_SEED = {
+  id: 'trip_interrail_2026',
+  name: 'Interrail 2026',
+  label: 'Berlin → Cluj via Central & Eastern Europe',
+  icon: '🚆',
+  theme: 'forest',
+  created: Date.now(),
+  pills: ['📅 May 26 – June 16','🗺️ 12 cities','🚂 22 nights','🇩🇪 🇨🇿 🇵🇱 🇦🇹 🇸🇮 🇭🇺 🇷🇴'],
+  cities: [
+    {id:"berlin", name:"Berlin", dates:"May 26–27", nights:2, sights:[{title:"Brandenburg Gate & Pariser Platz",badge:"free",desc:"The iconic neoclassical gate — best at golden hour when the crowds thin. Walk east along Unter den Linden to soak in the grand boulevard."},{title:"Memorial to the Murdered Jews of Europe",badge:"free",desc:"2,711 concrete stelae designed by Peter Eisenman. Deeply moving, free to enter the underground information centre. Allow 45 mins."},{title:"East Side Gallery",badge:"free",desc:"1.3km of the Berlin Wall covered in murals by international artists. The Fraternal Kiss and the Trabant breaking through the wall are unmissable."},{title:"Hackescher Markt & Scheunenviertel",badge:"free",desc:"Berlin's most charming neighbourhood — art nouveau courtyards (Hackesche Höfe), indie boutiques, street art and café culture. Perfect for wandering."},{title:"Tempelhof Field",badge:"free",desc:"Former Nazi-era airport now a vast public park. Locals cycle, rollerblade and have BBQs on the runways. One of Europe's most surreal open spaces."},{title:"Topography of Terror",badge:"free",desc:"Outdoor and indoor museum on the site of the former SS and Gestapo headquarters. Unflinching and essential — one of the best free museums in Europe."},{title:"Pergamon Museum Island",badge:"cheap",desc:"€12 — includes the Pergamon Altar, Ishtar Gate and the Market Gate of Miletus. UNESCO World Heritage. Book ahead online to skip queues."},{title:"Reichstag Dome",badge:"free",desc:"Book online (free) well in advance. The mirrored funnel and panoramic views across the city are absolutely worth it — book the sunset slot."}], views:[{title:"Victory Column (Siegessäule) summit",badge:"view",desc:"€3 to climb — views over the Tiergarten and city skyline. The golden goddess at the top is best photographed from below at sunset."},{title:"Teufelsberg",badge:"view",desc:"Abandoned Cold War NSA spy station on a rubble hill — graffiti-covered domes with 360° Berlin views. €8 entry, totally surreal."},{title:"Molecule Man (from Treptower Park)",badge:"view",desc:"Free riverside walk at dusk with the giant aluminium sculpture glinting in the Spree — feels very Berlin."}], food:[{title:"Currywurst at Curry 36 (Mehringdamm)",badge:"food",desc:"Under €3 — Berlin's most iconic street food. A pork sausage slathered in curried ketchup, served with a bread roll. Queue at 2am with everyone else."},{title:"Döner Kebab at Mustafa's (Mehringdamm)",badge:"food",desc:"Under €6. Legendary queue-worthy döner with roasted veg, fresh herbs and sauces. The queue is half the experience."},{title:"Markthalle Neun (Thursdays, Street Food Thursday)",badge:"food",desc:"€5–10. A beautiful 19th-century covered market in Kreuzberg hosting Berlin's best street food night every Thursday. Diverse, cheap, buzzing."},{title:"Pretzels & bread at any Bäckerei",badge:"food",desc:"Under €2. Germany does breakfast bread like nowhere else. Grab a Laugenbrezel (lye pretzel) and a coffee from any bakery for the perfect start."},{title:"Schnitzel at Zur Letzten Instanz (oldest Berlin restaurant)",badge:"food",desc:"€12–15 for mains — traditional Berliner Schnitzel with Bratkartoffeln (fried potatoes). Historic wooden interior, trading since 1621."}], cafes:[{title:"Café Einstein Stammhaus",badge:"cafe",desc:"A magnificent 1920s Viennese-style coffeehouse in a Charlottenburg villa. Order the Einspänner (black coffee with whipped cream) and apple strudel. €5–8 for coffee. Absolutely stunning interior."},{title:"Bonanza Coffee (Prenzlauer Berg)",badge:"cafe",desc:"Berlin's best specialty coffee in a converted stable. Industrial-chic, outstanding espresso, beloved by the creative crowd. €3–5."},{title:"Café Aroma (Schöneberg)",badge:"cafe",desc:"Neighbourhood gem with mismatched vintage furniture and excellent homemade cakes. Cash only, €3–5, very local crowd."}], nightlife:[{title:"Berghain / Panorama Bar",badge:"night",desc:"The world's most famous techno club — Sunday morning queue is a rite of passage. Dress in black, no photos inside, pure electronic music. Entry €15–20 if you get in."},{title:"Klunkerkranich (rooftop, Neukölln)",badge:"night",desc:"Rooftop bar on top of a shopping centre car park with views over Neukölln. Free during the day, small entry fee evenings. Very Berlin."},{title:"Bar Tausend",badge:"night",desc:"Hidden bar under the S-Bahn tracks near Friedrichstrasse — no sign, steel hatch door. Stylish cocktails, great music. €10–14 cocktails."},{title:"Prater Garten (Prenzlauer Berg)",badge:"night",desc:"Berlin's oldest beer garden, open since 1837. Under the chestnut trees with a cold Pilsner for €4. Loud, fun, unpretentious."}], daytrips:[{title:"Potsdam & Sanssouci Palace",badge:"daytrip",desc:"30 mins by S-Bahn (€4 on Berlin AB+C ticket). Frederick the Great's summer palace is jaw-dropping — terraced vineyard gardens, rococo interiors. Budget full day."},{title:"Sachsenhausen Concentration Camp",badge:"daytrip",desc:"Free entry, 35 mins by S1 train. One of the most important WWII memorial sites in Europe. Sobering and essential."}]},
+    {id:"prague", name:"Prague", dates:"May 28–30", nights:3, sights:[{title:"Prague Castle & St Vitus Cathedral",badge:"cheap",desc:"€4 for the short circuit (cathedral, Old Royal Palace). The largest castle complex in the world — views over the city from the ramparts are unbeatable."},{title:"Charles Bridge at dawn",badge:"free",desc:"Get there before 7am to have the 600-year-old Gothic bridge almost to yourself. The statues are extraordinary, and the light over the Old Town towers is magical."},{title:"Old Town Square & Astronomical Clock",badge:"free",desc:"The hourly clock show is touristy but the square itself is genuinely stunning — Gothic Týn Church, Baroque St Nicholas, the Old Town Hall. Best at golden hour."},{title:"Josefov (Jewish Quarter) walk",badge:"free",desc:"The exterior streets are free — six synagogues and the Old Jewish Cemetery (entry €16 but exterior viewing is free and beautiful). Wander Parízská and Maiselova."},{title:"Vyšehrad Fortress & Cemetery",badge:"free",desc:"Far fewer tourists than Prague Castle. Celtic and Slavic myth-laden hilltop fortress with a Romanesque rotunda and the cemetery where Dvorák and Mucha are buried."}], views:[{title:"Letná Park (beer garden with panorama)",badge:"view",desc:"Free — the best panorama of Prague's bridges and old town rooftops. The beer garden here is beloved by locals. Go at sunset with a Pilsner Urquell."},{title:"Vítkov Hilltop",badge:"view",desc:"Free. Away from tourists entirely — the enormous equestrian statue of Jan Žižka and far-reaching views over the city. One of the largest equestrian statues in the world."}], food:[{title:"Svíčková at Lokál Dlouhááá",badge:"food",desc:"€8–12. The essential Czech dish — beef sirloin in creamy root vegetable sauce with bread dumplings. Lokál does the definitive version."},{title:"Trdelník from the old town stalls",badge:"food",desc:"€3–5. A spiral spit-roasted pastry dusted in cinnamon sugar — ignore the Instagrammable ice cream versions and go for the classic plain one. Peak Bohemian street food."},{title:"Craft beer at Lokál",badge:"food",desc:"€2–3 per half-litre. The best unfiltered tank Pilsner Urquell in Prague — piped directly to the bar from tanks in the cellar. The head is perfect. The beer is cold. Perfect pub."}], cafes:[{title:"Café Savoy",badge:"cafe",desc:"A magnificent Belle Époque café with neo-Renaissance ceiling friezes on Vítězná — remarkable architecture. €4–6 coffee, excellent pastries. The weekend brunch queue is worth it."},{title:"Café Louvre",badge:"cafe",desc:"Open since 1902 — Kafka's favourite haunt. High ceilings, billiard tables, great coffee and traditional Czech pastry. €3–5. The most Viennese café in Prague."}], nightlife:[{title:"Hemingway Bar",badge:"night",desc:"The best cocktail bar in Central Europe — meticulous pre-Prohibition-era cocktails in a beautiful Art Deco interior. €10–15 per cocktail. Book ahead."},{title:"Cross Club (Holešovice)",badge:"night",desc:"The most extraordinary club space in Europe — a multi-level post-industrial club with steampunk decor, pipes, gears and walkways. Techno and industrial. €4 entry."}], daytrips:[]},
+    {id:"krakow", name:"Kraków", dates:"May 31–Jun 1", nights:2, sights:[{title:"Wawel Castle & Cathedral",badge:"cheap",desc:"€7 for the state rooms and armoury. The seat of Polish kings on a limestone hill above the Vistula — magnificent Renaissance courtyard. The dragon's den is free."},{title:"Kazimierz (Jewish Quarter)",badge:"free",desc:"The spiritual heart of the trip — pre-war Jewish Kraków preserved almost intact. Walk Szeroka Street, visit the Remuh Synagogue and Cemetery (€2), wander Plac Nowy."},{title:"Oskar Schindler's Factory",badge:"cheap",desc:"€10. The famous enamelware factory now houses an extraordinary WWII and occupation museum. One of the best museum experiences in Europe. Book online."}], views:[{title:"Kosciuszko Mound",badge:"view",desc:"Free or €3 to the hilltop. An artificial mound built in 1823 — 360° views over the city and countryside. The walk up is beautiful."}], food:[{title:"Zapiekanka at Plac Nowy",badge:"food",desc:"€3–4. Poland's greatest street food — a baguette half topped with mushrooms, cheese and ketchup. The stalls around Plac Nowy in Kazimierz are the correct version."},{title:"Pierogi at Milkbar Tomasza",badge:"food",desc:"€4–8 for a plate. Dumplings stuffed with potato and cheese, meat, mushroom or blueberry. A milk bar (bar mleczny) is a communist-era subsidised canteen. Wonderful."}], cafes:[{title:"Café Camelot",badge:"cafe",desc:"Medieval cellar café on Świętego Tomasza with candles, Baroque furnishings and Polish apple cake. €3–4 coffee, €3 cake. The most atmospheric café in Kraków."},{title:"Kawiarnia Noworolski (Main Square)",badge:"cafe",desc:"The grandest café on the Rynek — inside the Cloth Hall, open since 1910. Grand interior, perfect for coffee and watching the pigeons on the square. €4–6."}], nightlife:[{title:"Pod Jaszczurami (Under the Lizards) student club",badge:"night",desc:"Kraków's oldest student club in a cellar under the main square — jazz, folk, cabaret. Entry €3–5, cheap drinks. One of the most authentic nights you'll have."},{title:"Alchemia (Kazimierz)",badge:"night",desc:"The original Kazimierz ruin bar — candlelit, mismatched furniture, eclectic music. €3–4 beers. The bar that started the ruin bar phenomenon before Budapest took it global."}], daytrips:[{title:"Auschwitz-Birkenau",badge:"daytrip",desc:"Free entry (guided tours €15–30 recommended). 1.5hrs by bus/train (€4 return). The most important and most sobering day of the entire trip. Non-negotiable."}]},
+    {id:"brno", name:"Brno", dates:"Jun 2", nights:1, sights:[{title:"Špilberk Castle",badge:"cheap",desc:"€6. The former Habsburg prison and now city museum on a hill — the casements (dungeons) are extraordinary. Views over Brno's beautiful rooftops from the ramparts."},{title:"Ossuary under St James's Church",badge:"cheap",desc:"€5. The second-largest ossuary in Europe — 50,000 skeletons arranged beneath the church in long-forgotten crypts. Rediscovered in 2001. Beautifully presented."},{title:"Villa Tugendhat (UNESCO)",badge:"mid",desc:"€20 guided tour — must book weeks ahead. Mies van der Rohe's 1930 masterpiece is the most important modernist building in Central Europe. Book early."}], views:[{title:"Petrov Cathedral tower",badge:"view",desc:"€3. The double-spired cathedral that rings its noon bells at 11am (a tradition from a 30 Years War siege). The tower gives views over all of Brno."}], food:[{title:"Moravian wines at Vinárna v ráji",badge:"food",desc:"€3–5 per glass. Moravia produces extraordinary wine almost unknown outside the Czech Republic — Pálava, Welschriesling and Zweigeltrebe are the ones to try. Very good food too."},{title:"Kulajda soup at Šelepka",badge:"food",desc:"€5–7. The great Moravian soup — cream, potato, dill, mushroom and a poached egg. Available at almost every traditional restaurant. Warming and wonderful."}], cafes:[{title:"Café Podnebí",badge:"cafe",desc:"Lovely café with a terrace near the central market — good coffee, excellent cakes and friendly service. €3–4 coffee."}], nightlife:[{title:"Bar, který neexistuje (The Bar That Doesn't Exist)",badge:"night",desc:"A hidden cocktail bar in Brno's creative quarter — ring the doorbell and quote the name. Excellent cocktails, intimate atmosphere. €8–12 cocktails."}], daytrips:[]},
+    {id:"vienna", name:"Vienna", dates:"Jun 3–4", nights:2, sights:[{title:"Kunsthistorisches Museum",badge:"mid",desc:"€21. The Habsburg imperial art collection — one of the greatest in the world. Vermeer, Bruegel, Raphael and the largest Caravaggio collection outside Italy. The building alone is worth the entry."},{title:"Schönbrunn Palace & gardens",badge:"cheap",desc:"Gardens free. €20–30 for palace rooms. The Habsburg summer palace — 1,441 rooms (only some open). The hillside Gloriette has the best view of the city."},{title:"Belvedere Palace (Upper & Lower)",badge:"mid",desc:"€17. The Upper Belvedere houses Klimt's The Kiss — the most famous painting in Vienna. The gardens between the two palaces are extraordinary."},{title:"St Stephen's Cathedral (Stephansdom)",badge:"free",desc:"Free to enter the nave. The Gothic masterpiece at Vienna's centre — the diamond-patterned roof is iconic. Climb the North Tower for views (€6) or descend to the catacombs (€6)."}], views:[{title:"Kahlenberg Hill",badge:"view",desc:"Free — take tram D and then bus 38A. Views over the entire city, the Danube and the Vienna Woods. Where the Turkish siege was broken in 1683."}], food:[{title:"Wiener Schnitzel at Figlmüller",badge:"mid",desc:"€18–25. The definitive Schnitzel — veal, pounded to enormous thinness, perfectly fried, hangs over the plate edges. The original restaurant in Wollzeile is the one. Queue or book."},{title:"Sachertorte at Café Central",badge:"food",desc:"€7–9. The famous dense chocolate torte with apricot jam, invented in 1832 — Café Central is more atmospheric than the Hotel Sacher itself."},{title:"Brettljause (cold platter) with Grüner Veltliner",badge:"food",desc:"€12–16. The great Austrian wine-bar meal — cold meats, pickles, cheese and bread with a carafe of local Grüner Veltliner. Every Heuriger (wine tavern) does this."}], cafes:[{title:"Café Central",badge:"cafe",desc:"The greatest café in the world — colonnaded neo-Gothic hall under a vaulted ceiling where Freud, Hitler, Stalin and Trotsky all drank coffee. €5–7. Unmissable."},{title:"Café Hawelka",badge:"cafe",desc:"Open since 1939, run by the same family. Dark, smoky, literary, unchanged. Order a Melange (coffee with milk) and a Buchteln (filled sweet bun) if you arrive after 10pm. €4–5."}], nightlife:[{title:"Naschmarkt wine bars at dusk",badge:"night",desc:"The market closes at 6pm but the wine bars on the south side stay open until midnight. Stand-up wine drinking (Stehwein) with Grüner Veltliner for €3–5 a glass."},{title:"Flex Club (Danube Canal)",badge:"night",desc:"Vienna's best electronic music club under the Augarten bridge — excellent acoustics, top international bookings. Entry €8–15. Opens at midnight."}], daytrips:[]},
+    {id:"bled", name:"Lake Bled", dates:"Jun 5–6", nights:2, sights:[{title:"Bled Castle (Blejski grad)",badge:"cheap",desc:"€15. The clifftop castle above the lake — medieval fortress with views straight down to the island church and surrounding Alps. The most dramatic viewpoint in Slovenia."},{title:"St Martin's Church from the lakeside promenade",badge:"free",desc:"Free walk around the whole lake (6km, 2hrs). The view of the castle, island and Julian Alps together is the iconic Bled photograph. Best light at dawn or dusk."},{title:"Triglav National Park visitor centre",badge:"free",desc:"The national park begins immediately around Bled. Pick up maps for the Vintgar Gorge walk (a must) and the Bohinj lake trails."}], views:[{title:"Ojstrica viewpoint (hilltop above south shore)",badge:"view",desc:"Free — a steep 20-minute hike from the south shore. The postcard view of Bled island and castle together with the Alps behind. Worth every step."},{title:"Vintgar Gorge",badge:"cheap",desc:"€8. A 1.6km wooden boardwalk through a dramatic river gorge just 4km from Bled — emerald water, waterfalls, rapids. One of the highlights of the trip. Go early."}], food:[{title:"Kremšnita (Bled cream cake)",badge:"food",desc:"€4–5. The original and only — vanilla custard and whipped cream in a square pastry case, invented at the Park Hotel Café in 1953. The correct place to eat it is the original café."}], cafes:[{title:"Park Hotel Café (Kremšnita terrace)",badge:"cafe",desc:"The original home of the Bled cream cake. Terrace with lake views, €3–5 coffee. Go at 3pm with a Kremšnita and a black coffee. It's peak Slovenia."}], nightlife:[{title:"The lakeside pubs",badge:"night",desc:"Bled is a small resort town. Pub Bled, Pub Triglav and Špica bar by the lake are where the backpacker crowd congregates in summer. €3–5 craft beers, relaxed vibe."}], daytrips:[{title:"Triglav National Park (Bohinj Lake)",badge:"daytrip",desc:"30 mins by bus (€4). A larger, quieter glacial lake with fewer tourists — kayaking, swimming and hiking. The Savica Waterfall hike is unmissable (free, 2hrs return)."}]},
+    {id:"ljubljana", name:"Ljubljana", dates:"Jun 7", nights:1, sights:[{title:"Ljubljana Castle funicular & views",badge:"cheap",desc:"Funicular €4 return (or hike free). The medieval castle above the city has excellent Slovenian history museum and views over the terracotta rooftops. Best at sunset."},{title:"Triple Bridge (Tromostovje) & Prešeren Square",badge:"free",desc:"Art nouveau bridges by Jože Plecnik — Ljubljana's most iconic architect left the whole city as his masterwork. Spend an hour spotting Plecnik's touches everywhere."},{title:"Ljubljana Central Market (Plecnik arcades)",badge:"free",desc:"Free to browse — the beautiful Plecnik-designed arcaded market along the riverbank. Fresh produce, local honey, pumpkin seed oil and handmade crafts. Saturday morning is best."}], views:[{title:"Castle tower at sunset",badge:"view",desc:"Included in funicular (€4) or free on foot. 360° panorama over the old town and the Ljubljana moors stretching to the Alps. Sunset turns the rooftops golden."}], food:[{title:"Kranjska klobasa (Carniolan sausage)",badge:"food",desc:"€4–6. Slovenia's protected sausage — chunky, coarsely ground pork, served at Gostilna Sokol or from the central market. With mustard and horseradish. Magnificent."},{title:"Štruklji (rolled dumplings)",badge:"food",desc:"€6–9 at Gostilna Sokol. Slovenian rolled pasta filled with cottage cheese and walnuts, then either boiled or baked. The defining Ljubljana comfort food."}], cafes:[{title:"Cajna Hiša (tearoom)",badge:"cafe",desc:"Gorgeous tearoom in a medieval cellar on the old town side of the river — 100+ teas from around the world, excellent cakes, candlelit. €3–5. A Ljubljana gem."}], nightlife:[{title:"Metelkova Mesto (midnight onwards)",badge:"night",desc:"The autonomous zone comes alive after midnight — multiple clubs in old barracks, from techno (Gala Hala) to queer (Tiffany) to alternative. Entry €3–5 or free."}], daytrips:[]},
+    {id:"budapest", name:"Budapest", dates:"Jun 8–10", nights:3, sights:[{title:"Fisherman's Bastion & Matthias Church",badge:"cheap",desc:"Fisherman's Bastion upper terrace €3 (lower level free). The neo-Gothic fairy-tale towers above Buda are the best viewpoint in the city. Arrive at sunrise (5:30am) to have them to yourself."},{title:"Parliament Building tour",badge:"cheap",desc:"€8 for EU citizens — the largest parliament building in the world and one of the most beautiful Gothic revival buildings anywhere. Mandatory."},{title:"Széchenyi Thermal Bath",badge:"mid",desc:"€22–28. The most beautiful thermal bath in Budapest — yellow baroque palace, outdoor pools at 38°C, steam rooms. Go on a Sunday evening for the legendary sparty (swimming party)."},{title:"Ruin Bars: Szimpla Kert",badge:"free",desc:"Free entry before 10pm. The original ruin bar in a crumbling Jewish quarter building — seven courtyards, mismatched furniture, a Trabant, cats. Sunday morning flea market is free and unmissable."},{title:"Great Synagogue (Dohány Street)",badge:"cheap",desc:"€8. The largest synagogue in Europe and second-largest in the world. The memorial garden with the weeping willow Holocaust memorial is deeply moving."}], views:[{title:"Fisherman's Bastion at sunrise",badge:"view",desc:"Free at 5:30am before the ticket booths open. The Parliament lit in dawn light from across the river is the greatest city view in Central Europe. Set your alarm."},{title:"Gellért Hill & Citadella",badge:"view",desc:"Free hike up. The Citadella at the top overlooks the entire city, the Danube bend, both Buda and Pest. Best at dusk. The Liberty Statue is also free."}], food:[{title:"Lángos at any market (Great Market Hall)",badge:"food",desc:"€3–5. Deep-fried flatbread topped with sour cream and cheese — Hungary's greatest street food. Best at the Great Market Hall (Nagycsarnok) on Fövám tér."},{title:"Goulash (gulyás) at a klasszikus étterem",badge:"food",desc:"€6–10. The real gulyás is a soup — paprika-rich beef and potato broth, not a stew. Try Kiskakukk Étterem or Menza for excellent versions."},{title:"Strudel at Rétesvár (Strudel House)",badge:"food",desc:"€3–4. Watch it being pulled and rolled by hand, then eat it hot with cherry, apple or poppy seed filling. Extraordinary."}], cafes:[{title:"New York Café",badge:"cafe",desc:"The most beautiful café in the world — gold leaf, frescoes, marble columns, chandeliers. Opened 1894. Coffee €6–8, cakes €7–10. Go for breakfast (€12–15 set menu). Non-negotiable."},{title:"Gerbeaud (Vörösmarty Square)",badge:"cafe",desc:"1858 Empire-style café on the main pedestrian square. Famous for its Eszterházy cake (walnut cream) and Dobos torte. €5–7 coffee, €5–8 cake. Very grand."}], nightlife:[{title:"Szimpla Kert ruin bar",badge:"night",desc:"The original ruin bar — arrive at 9pm, stay until 4am. Every room is different. Cheap drinks (€2–3 beers, €4–5 cocktails). Sunday morning flea market at 9am."},{title:"360 Bar (rooftop, near the Opera)",badge:"night",desc:"Rooftop bar with Parliament and Opera views — glass pyramid opens in summer. €8–12 cocktails, beautiful crowd, sunset is the moment to arrive. Free entry."}], daytrips:[{title:"Danube Bend (Szentendre, Visegrád, Esztergom)",badge:"daytrip",desc:"Train to Szentendre (€2, 40 mins) — charming Serbian Orthodox town. Continue by HÉV to Esztergom (Hungary's largest basilica) or Visegrád (ruined hilltop castle). Full day."},{title:"Memento Park (communist statues)",badge:"daytrip",desc:"Bus from Kelenföldi station (€4 return). €6 entry. All the giant Soviet and communist statues removed from Budapest after 1989 gathered in an open-air museum. Surreal and brilliant."}]},
+    {id:"cluj", name:"Cluj-Napoca", dates:"Jun 11 & Jun 15–16", nights:2, sights:[{title:"St Michael's Church & Unirii Square",badge:"free",desc:"One of the largest Gothic churches in Transylvania dominates the central square, which is also home to the equestrian statue of Matthias Corvinus — born here in 1443."},{title:"Central Park & Chios lake",badge:"free",desc:"Beautiful 19th-century English-style park with a lake, boats, and an open-air casino building. The park fills with students in the evenings — very lively in June."},{title:"Orthodox Cathedral of the Assumption",badge:"free",desc:"The enormous 1933 orthodox cathedral modelled on Hagia Sophia — free entry. The gold mosaics inside are spectacular."}], views:[{title:"Cetátuia Hill fortress",badge:"view",desc:"Free. Walk up from the old town for views over all of Cluj — the Catholic and Orthodox spires, the rooftops, the surrounding Transylvanian landscape. Sunset is wonderful."}], food:[{title:"Sarmale (stuffed cabbage rolls)",badge:"food",desc:"€5–8 at any traditional restaurant. Minced pork and rice wrapped in fermented cabbage leaves, slow-cooked with smoked meat. Romania's national dish and incredibly good."},{title:"Mici (grilled minced meat rolls)",badge:"food",desc:"€3–5 from street grills. Like a skinless sausage made from beef/pork/lamb with garlic and thyme. Served with mustard and flatbread. Essential Romanian street food."}], cafes:[{title:"Cafeneaua Bulgakov (Bulgakov Café)",badge:"cafe",desc:"A literary café named after Mikhail Bulgakov — exposed brick, books, great coffee and cakes. €2–3 coffee, excellent atmosphere. Popular with Cluj's student intelligentsia."}], nightlife:[{title:"Fantastic Club (electronic music)",badge:"night",desc:"Cluj's legendary underground electronic music club and label. International and local DJs, €5–10 entry. Part of why Cluj is considered one of Eastern Europe's best club cities."},{title:"Form Space",badge:"night",desc:"The other great electronic venue — industrial space, excellent sound system, very cutting-edge bookings. €5–10 entry. Don't arrive before midnight."}], daytrips:[]},
+    {id:"sighisoara", name:"Sighișoara", dates:"Jun 12–13", nights:2, sights:[{title:"The Citadel (UNESCO fortified historic centre)",badge:"free",desc:"The medieval hilltop citadel is free to walk — one of the best-preserved medieval towns in Europe. The coloured burgher houses, cobblestones and towers are completely intact. Pure magic."},{title:"Clock Tower (Turnul cu Ceas)",badge:"cheap",desc:"€4. The 14th-century tower houses the city museum. Climb to the top for views over the citadel rooftops and the surrounding Transylvanian hills. Don't miss the painted clock mechanism."},{title:"Vlad Dracul House (Vlad the Impaler's birthplace)",badge:"cheap",desc:"€2. The house where Vlad III (Dracula's real inspiration) was born in 1431. Now a restaurant downstairs — have a beer in the birthplace of history's most infamous Transylvanian."},{title:"Scholars' Stairs & hilltop church",badge:"free",desc:"175 covered wooden stairs built in 1642 lead up through the citadel to the Church on the Hill. The covered stairway is beautifully weathered. The church interior is free."}], views:[{title:"Clock Tower platform",badge:"view",desc:"€4 entry. The best view over the entire citadel — terracotta and ochre rooftops stretching to rolling hills. Extraordinary at golden hour."}], food:[{title:"Kürtöskalács from the citadel stalls",badge:"food",desc:"€2–3. The Transylvanian original — this is where chimney cake actually comes from. Still made on wood fires at the little stalls. Far better than the Prague or Budapest versions."}], cafes:[{title:"Café International (inside the citadel)",badge:"cafe",desc:"Stone-vaulted medieval interior, excellent coffee, homemade cakes. €2–3 coffee. Sitting in a 600-year-old room drinking coffee is one of the trip highlights."}], nightlife:[{title:"The citadel pubs",badge:"night",desc:"Joseph's Bar and the handful of restaurants in the upper citadel serve good local wine (€2–4 a glass) until midnight. Sit outside under the towers. It's peaceful, beautiful and very atmospheric."}], daytrips:[{title:"Biertan Fortified Church (UNESCO)",badge:"daytrip",desc:"30 mins by taxi/shared ride (€10–15 return). One of the finest Saxon fortified churches in Transylvania — triple circuit of defensive walls, stunning hilltop location."},{title:"Viscri (Prince Charles's favourite village)",badge:"daytrip",desc:"45 mins by car (arrange with guesthouse). The most beautiful Saxon village in Transylvania — cobbled street, painted houses, UNESCO church, horse-drawn carts still in use."}]},
+    {id:"brasov", name:"Brașov", dates:"Jun 14", nights:1, sights:[{title:"Black Church (Biserica Neagra)",badge:"cheap",desc:"€4. The largest Gothic church in Romania and Eastern Europe — blackened in a 1689 fire, hence the name. Houses a remarkable collection of Anatolian rugs and a massive organ."},{title:"Council Square (Piata Sfatului)",badge:"free",desc:"The beautiful medieval main square — surrounded by Baroque and Renaissance buildings, the old Council House in the middle. Best with a coffee from one of the terrace cafés."},{title:"Strada Sforii (narrowest street in Romania)",badge:"free",desc:"Just 111cm at its narrowest — one of the narrowest streets in Europe. Free to walk through. A cobbled medieval alley connecting two streets. Short but unmissable."}], views:[{title:"Tampa Mountain cable car & peak",badge:"cheap",desc:"€8 return for cable car, or free to hike (1hr). The summit has spectacular views over Brașov's orange rooftops, the Carpathian Mountains and, if clear, Bran Castle on the horizon."}], food:[{title:"Brașovean roast at Sergiana restaurant",badge:"food",desc:"€8–12 mains. The best traditional Transylvanian restaurant in Brașov — grilled meats, polenta, cabbage, and exceptional local sour cherry compote. Huge portions."},{title:"Papanași (fried cheese doughnuts)",badge:"food",desc:"€4–6. The great Romanian dessert — two deep-fried cottage cheese doughnuts drowned in sour cream and sour cherry jam. Rich, unglamorous, absolutely delicious."}], cafes:[{title:"Café del Piatto",badge:"cafe",desc:"A lovely café on Council Square with a terrace — good coffee, homemade cakes, excellent location. €2–3 coffee. The terrace in the morning sun is beautiful."}], nightlife:[{title:"Deane's Irish Pub",badge:"night",desc:"The best pub in Brașov — always packed with young locals and travellers. Live music some nights. €3–4 beers. Good craic in a medieval building."}], daytrips:[{title:"Bran Castle ('Dracula's Castle')",badge:"daytrip",desc:"30 mins by bus (€2 return). Entry €14. Not actually Vlad's castle (he barely visited) but a stunning medieval fortress anyway. The landscape is spectacular. Arrive before 10am."},{title:"Peleș Castle (Sinaia)",badge:"daytrip",desc:"50 mins by train (€3). The most beautiful castle in Romania — Neo-Renaissance with a Bavarian mountain backdrop. Entry €14. One of the highlights of the whole trip."}]}
+  ],
+  budget: [
+    {id:'hostels',name:'Hostels & Accommodation',icon:'🏨',col1:'Hostel Name',col2:'City',_open:true,rows:[
+      {id:'h1',name:'Hostel One Berlin',detail:'Berlin',note:'',amount:36,paid:false},
+      {id:'h2',name:'Czech Inn Prague',detail:'Prague',note:'',amount:51,paid:false},
+      {id:'h3',name:"Greg & Tom Kraków",detail:'Kraków',note:'',amount:30,paid:false},
+      {id:'h4',name:'Hostel Brno',detail:'Brno',note:'',amount:18,paid:false},
+      {id:'h5',name:'Wombats Vienna',detail:'Vienna',note:'',amount:44,paid:false},
+      {id:'h6',name:'Travellers Haven Bled',detail:'Lake Bled',note:'',amount:36,paid:false},
+      {id:'h7',name:'Hostel Ljubljana',detail:'Ljubljana',note:'',amount:20,paid:false},
+      {id:'h8',name:'Hostel One Pest Budapest',detail:'Budapest',note:'',amount:54,paid:false},
+      {id:'h9',name:'Retro Hostel Cluj',detail:'Cluj-Napoca',note:'',amount:24,paid:false},
+      {id:'h10',name:'Old Town Hostel Sighișoara',detail:'Sighișoara',note:'',amount:28,paid:false},
+      {id:'h11',name:'Hostel Brașov',detail:'Brașov',note:'',amount:18,paid:false},
+    ]},
+    {id:'flights',name:'Flights',icon:'✈️',col1:'Route',col2:'Date',_open:true,rows:[]},
+    {id:'flixbus',name:'FlixBus',icon:'🚌',col1:'Route',col2:'Date',_open:true,rows:[
+      {id:'fb1',name:'Berlin → Prague',detail:'May 27',note:'',amount:12,paid:false},
+      {id:'fb2',name:'Brno → Vienna',detail:'Jun 2',note:'',amount:8,paid:false},
+      {id:'fb3',name:'Ljubljana → Budapest',detail:'Jun 7',note:'',amount:15,paid:false},
+    ]},
+    {id:'trains',name:'Train Seat Reservations',icon:'🚆',col1:'Train / Route',col2:'Date',_open:true,rows:[
+      {id:'t1',name:'Prague → Kraków',detail:'May 30',note:'Reservation required',amount:6,paid:false},
+      {id:'t2',name:'Vienna → Bled (Ljubljana)',detail:'Jun 4',note:'',amount:10,paid:false},
+      {id:'t3',name:'Budapest → Cluj-Napoca',detail:'Jun 10',note:'Night train',amount:14,paid:false},
+    ]}
+  ]
+};
+
+/* =============================================================
+   INIT
+============================================================= */
+async function init() {
+  await initLogin();
+}
+
+// Seed interrail trip for new users after login
+const _origLoadUserData = loadUserData;
+loadUserData = async function() {
+  await _origLoadUserData();
+  // If user has no trips, seed the interrail one
+  if (Object.keys(allTrips).length === 0) {
+    allTrips[INTERRAIL_SEED.id] = JSON.parse(JSON.stringify(INTERRAIL_SEED));
+    await cloudSet('u_' + currentUser, { trips: allTrips });
+  }
+};
+
+init();
+</script>
+
+<!-- PWA manifest via blob -->
+<script>
+(function() {
+  const manifest = {
+    name: "Trip Planner",
+    short_name: "Trips",
+    description: "Plan and budget your adventures",
+    start_url: "./",
+    display: "standalone",
+    background_color: "#F7F4EF",
+    theme_color: "#1A1714",
+    orientation: "portrait-primary",
+    icons: [
+      { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231A1714'/><text y='.9em' font-size='70' x='12'>✈️</text></svg>", sizes: "192x192", type: "image/svg+xml" }
+    ]
+  };
+  try {
+    const blob = new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('link');
+    link.rel = 'manifest'; link.href = url;
+    document.head.appendChild(link);
+  } catch(e) {}
+})();
+</script>
+
+</body>
+</html>
